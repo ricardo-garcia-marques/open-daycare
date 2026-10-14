@@ -74,11 +74,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
 ::-webkit-scrollbar {
   width: 10px;
 }
