@@ -74,14 +74,14 @@ Sin estructura nueva persistida: es solo visual, `/` es un Server Component que 
 
 ## Criterios de aceptación
 
-- [ ] `/` renderiza sin errores de consola.
-- [ ] La página usa fondo `#F6ECDF`, tarjetas `#FFFDF9` y las fuentes Fredoka/Nunito (coincide visualmente con el mockup).
-- [ ] Aparecen exactamente los 3 posts del mockup con sus badges LOGRO/ACTIVIDAD/ANUNCIO, horas, likes y comentarios idénticos.
-- [ ] El sidebar muestra Feed activo (fondo `#FBE3D8`), Niños, Avisos, Mi cuenta y el usuario Caro Giménez.
-- [ ] Los 5 enlaces (Niños, Avisos, Mi cuenta, Nueva publicación, logout) navegan a sus rutas stub.
-- [ ] Cada stub muestra placeholder "pantalla pendiente".
-- [ ] El título del documento es "OpenDayCare" y `<html lang="es">`.
-- [ ] `npm run lint` y `npx tsc --noEmit` pasan sin errores.
+- [x] `/` renderiza sin errores de consola.
+- [x] La página usa fondo `#F6ECDF`, tarjetas `#FFFDF9` y las fuentes Fredoka/Nunito (coincide visualmente con el mockup).
+- [x] Aparecen exactamente los 3 posts del mockup con sus badges LOGRO/ACTIVIDAD/ANUNCIO, horas, likes y comentarios idénticos.
+- [x] El sidebar muestra Feed activo (fondo `#FBE3D8`), Niños, Avisos, Mi cuenta y el usuario Caro Giménez.
+- [x] Los 5 enlaces (Niños, Avisos, Mi cuenta, Nueva publicación, logout) navegan a sus rutas stub.
+- [x] Cada stub muestra placeholder "pantalla pendiente".
+- [x] El título del documento es "OpenDayCare" y `<html lang="es">`.
+- [x] `npm run lint` y `npx tsc --noEmit` pasan sin errores.
 
 ## Decisiones
 

@@ -37,5 +37,10 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - /spec Usaremos esta habilidad para crear las especificaciones.
 - /spec-impl Usaremos esta skill para hacer las implementaciones.
 
+## Spec Driven Development - Verificación
+
+- **Agente `spec-verifier`** (subagent): verifica specs en `specs/*.md` tras su implementación. Comprueba cada criterio de aceptación contra el código real (`tsc`, `lint`, `npm run dev` + Playwright MCP a 1280px, navegación, DOM), marca los checkboxes `[x]`/`[ ]` del spec según resultados reales y detiene el dev server al terminar. Artefactos en `.playwright-mcp/`.
+- **Comando verify spec**: para verificar un spec, invocar el task tool con `subagent_type: "spec-verifier"`, pasando la ruta del spec (ej. `specs/01-feed-home.md`) y en el prompt: contexto del proyecto (Next.js 16 + `cacheComponents`, Tailwind v4 vía Turbopack loader), comandos de verificación, reglas de artefactos Playwright, el resumen de lo que exige el spec y la instrucción de actualizar los checkboxes del spec según resultados reales (PASS/FAIL/UNVERIFIABLE con evidencia).
+
 ## Reglas de codigo
 - usar codigo limpio, nombres, funciones, variables, etc. en ingles
