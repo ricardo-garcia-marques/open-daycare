@@ -1,65 +1,75 @@
 @import "tailwindcss";
 
 :root {
-  --color-page-bg: #f6ecdf;
-  --color-surface: #fffdf9;
-  --color-surface-alt: #f4ece1;
-  --color-border: #ece0d0;
-  --color-border-soft: #f0e6d8;
-  --color-divider: #e7dac8;
-  --color-primary: #d9583c;
-  --color-primary-strong: #c5503a;
-  --color-accent: #f2937a;
-  --color-compose-gradient-from: #f4977e;
-  --color-compose-gradient-to: #ee8164;
-  --color-logo-gradient-from: #f8c3a8;
-  --color-logo-gradient-to: #f2937a;
-  --color-nav-active-bg: #fbe3d8;
-  --color-nav-inactive: #6e6359;
-  --color-heading: #3f362e;
-  --color-body: #4a4038;
-  --color-muted: #94887b;
-  --color-muted-light: #a89a8b;
-  --color-label: #8a7c6d;
-  --color-badge-achievement-bg: #cfebd8;
-  --color-badge-achievement-dot: #3e9b6c;
-  --color-badge-achievement-text: #3e9b6c;
-  --color-badge-activity-bg: #c7e7f1;
-  --color-badge-activity-dot: #2e89a6;
-  --color-badge-activity-text: #2e89a6;
-  --color-badge-announcement-bg: #ccd8f4;
-  --color-badge-announcement-dot: #4e72c8;
-  --color-badge-announcement-text: #4e72c8;
-  --color-photo-border: #dbcdba;
-  --color-photo-text: #b0a290;
-  --color-avatar-like: #e0654a;
-  --color-scrollbar: #e4d6c4;
+  --page-bg: #f6ecdf;
+  --surface: #fffdf9;
+  --surface-alt: #f4ece1;
+  --border: #ece0d0;
+  --border-soft: #f0e6d8;
+  --divider: #e7dac8;
+  --primary: #d9583c;
+  --primary-strong: #c5503a;
+  --accent: #f2937a;
+  --compose-gradient-from: #f4977e;
+  --compose-gradient-to: #ee8164;
+  --logo-gradient-from: #f8c3a8;
+  --logo-gradient-to: #f2937a;
+  --nav-active-bg: #fbe3d8;
+  --nav-inactive: #6e6359;
+  --heading: #3f362e;
+  --body-text: #4a4038;
+  --muted: #94887b;
+  --muted-light: #a89a8b;
+  --label: #8a7c6d;
+  --badge-achievement-bg: #cfebd8;
+  --badge-achievement: #3e9b6c;
+  --badge-activity-bg: #c7e7f1;
+  --badge-activity: #2e89a6;
+  --badge-announcement-bg: #ccd8f4;
+  --badge-announcement: #4e72c8;
+  --photo-border: #dbcdba;
+  --photo-text: #b0a290;
+  --like: #e0654a;
+  --scrollbar: #e4d6c4;
 }
 
 @theme inline {
-  --color-page-bg: var(--color-page-bg);
-  --color-surface: var(--color-surface);
-  --color-surface-alt: var(--color-surface-alt);
-  --color-border: var(--color-border);
-  --color-border-soft: var(--color-border-soft);
-  --color-divider: var(--color-divider);
-  --color-primary: var(--color-primary);
-  --color-primary-strong: var(--color-primary-strong);
-  --color-accent: var(--color-accent);
-  --color-nav-active-bg: var(--color-nav-active-bg);
-  --color-nav-inactive: var(--color-nav-inactive);
-  --color-heading: var(--color-heading);
-  --color-body: var(--color-body);
-  --color-muted: var(--color-muted);
-  --color-muted-light: var(--color-muted-light);
-  --color-label: var(--color-label);
+  --color-page-bg: var(--page-bg);
+  --color-surface: var(--surface);
+  --color-surface-alt: var(--surface-alt);
+  --color-border: var(--border);
+  --color-border-soft: var(--border-soft);
+  --color-divider: var(--divider);
+  --color-primary: var(--primary);
+  --color-primary-strong: var(--primary-strong);
+  --color-accent: var(--accent);
+  --color-compose-gradient-from: var(--compose-gradient-from);
+  --color-compose-gradient-to: var(--compose-gradient-to);
+  --color-logo-gradient-from: var(--logo-gradient-from);
+  --color-logo-gradient-to: var(--logo-gradient-to);
+  --color-nav-active-bg: var(--nav-active-bg);
+  --color-nav-inactive: var(--nav-inactive);
+  --color-heading: var(--heading);
+  --color-body: var(--body-text);
+  --color-muted: var(--muted);
+  --color-muted-light: var(--muted-light);
+  --color-label: var(--label);
+  --color-badge-achievement-bg: var(--badge-achievement-bg);
+  --color-badge-achievement: var(--badge-achievement);
+  --color-badge-activity-bg: var(--badge-activity-bg);
+  --color-badge-activity: var(--badge-activity);
+  --color-badge-announcement-bg: var(--badge-announcement-bg);
+  --color-badge-announcement: var(--badge-announcement);
+  --color-photo-border: var(--photo-border);
+  --color-photo-text: var(--photo-text);
+  --color-like: var(--like);
   --font-sans: var(--font-nunito), system-ui, sans-serif;
   --font-display: var(--font-fredoka), var(--font-nunito), system-ui, sans-serif;
 }
 
 body {
-  background: var(--color-page-bg);
-  color: var(--color-heading);
+  background: var(--page-bg);
+  color: var(--heading);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
 }
@@ -74,7 +84,7 @@ a {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-scrollbar);
+  background: var(--scrollbar);
   border-radius: 8px;
   border: 3px solid transparent;
   background-clip: content-box;
