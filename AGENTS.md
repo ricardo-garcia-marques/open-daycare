@@ -36,3 +36,6 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 - /spec Usaremos esta habilidad para crear las especificaciones.
 - /spec-impl Usaremos esta skill para hacer las implementaciones.
+
+## Reglas de codigo
+- usar codigo limpio, nombres, funciones, variables, etc. en ingles
