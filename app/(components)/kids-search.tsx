@@ -40,15 +40,16 @@ function SearchIcon() {
 }
 
 function parentsLabel(kid: Kid): string {
-  if (kid.linkedParents === 0) {
+  const parentCount = kid.linkedParents.length;
+  if (parentCount === 0) {
     return "sin padres vinculados";
   }
-  return `${kid.linkedParents} ${kid.linkedParents === 1 ? "padre vinculado" : "padres vinculados"}`;
+  return `${parentCount} ${parentCount === 1 ? "padre vinculado" : "padres vinculados"}`;
 }
 
 function KidCard({ kid }: { kid: Kid }) {
   const showAllergyBadge = kid.allergies.length > 0;
-  const showLinkBadge = kid.linkedParents === 0;
+  const showLinkBadge = kid.linkedParents.length === 0;
 
   return (
     <Link
