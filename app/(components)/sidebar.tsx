@@ -125,7 +125,7 @@ function LogoutIcon() {
 
 const NAV_ITEMS = [
   { href: "/", label: "Feed", icon: <HomeIcon />, active: true },
-  { href: "/ninos", label: "Niños", icon: <KidsIcon />, active: false },
+  { href: "/kids", label: "Niños", icon: <KidsIcon />, active: false },
   { href: "/avisos", label: "Avisos", icon: <BellIcon />, active: false },
   { href: "/mi-cuenta", label: "Mi cuenta", icon: <UserIcon />, active: false },
 ];
