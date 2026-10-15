@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 function SunIcon() {
   return (
@@ -124,13 +127,14 @@ function LogoutIcon() {
 }
 
 const NAV_ITEMS = [
-  { href: "/", label: "Feed", icon: <HomeIcon />, active: true },
-  { href: "/kids", label: "Niños", icon: <KidsIcon />, active: false },
-  { href: "/avisos", label: "Avisos", icon: <BellIcon />, active: false },
-  { href: "/mi-cuenta", label: "Mi cuenta", icon: <UserIcon />, active: false },
+  { href: "/", label: "Feed", icon: <HomeIcon />, exact: true },
+  { href: "/kids", label: "Niños", icon: <KidsIcon />, exact: false },
+  { href: "/avisos", label: "Avisos", icon: <BellIcon />, exact: false },
+  { href: "/mi-cuenta", label: "Mi cuenta", icon: <UserIcon />, exact: false },
 ];
 
 export function Sidebar() {
+  const pathname = usePathname();
   return (
     <aside className="w-[248px] flex-none bg-surface border-r border-border flex flex-col py-6 px-4 sticky top-0 h-screen">
       <Link href="/" className="flex items-center gap-[11px] px-2 pt-1 pb-[22px]">
@@ -154,20 +158,26 @@ export function Sidebar() {
       </Link>
 
       <nav className="flex flex-col gap-1 flex-1">
-        {NAV_ITEMS.map((item) => (
-          <Link
-            key={item.label}
-            href={item.href}
-            className={
-              item.active
-                ? "flex items-center gap-3 py-[11px] px-3 rounded-[12px] bg-nav-active-bg text-primary font-extrabold text-[14.5px]"
-                : "flex items-center gap-3 py-[11px] px-3 rounded-[12px] bg-transparent text-nav-inactive font-semibold text-[14.5px]"
-            }
-          >
-            {item.icon}
-            {item.label}
-          </Link>
-        ))}
+        {NAV_ITEMS.map((item) => {
+          const itemActive = item.exact
+            ? pathname === item.href
+            : pathname.startsWith(item.href);
+
+          return (
+            <Link
+              key={item.label}
+              href={item.href}
+              className={
+                itemActive
+                  ? "flex items-center gap-3 py-[11px] px-3 rounded-[12px] bg-nav-active-bg text-primary font-extrabold text-[14.5px]"
+                  : "flex items-center gap-3 py-[11px] px-3 rounded-[12px] bg-transparent text-nav-inactive font-semibold text-[14.5px]"
+              }
+            >
+              {item.icon}
+              {item.label}
+            </Link>
+          );
+        })}
       </nav>
 
       <div className="border-t border-border pt-[14px] mt-2.5">
