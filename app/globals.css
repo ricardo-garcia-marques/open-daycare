@@ -30,6 +30,10 @@
   --photo-border: #dbcdba;
   --photo-text: #b0a290;
   --like: #e0654a;
+  --chip-allergy-bg: #fbd8cc;
+  --chip-allergy: #d9684a;
+  --chip-link-bg: #f9d2de;
+  --chip-link: #c56486;
   --scrollbar: #e4d6c4;
 }
 
@@ -63,6 +67,10 @@
   --color-photo-border: var(--photo-border);
   --color-photo-text: var(--photo-text);
   --color-like: var(--like);
+  --color-chip-allergy-bg: var(--chip-allergy-bg);
+  --color-chip-allergy: var(--chip-allergy);
+  --color-chip-link-bg: var(--chip-link-bg);
+  --color-chip-link: var(--chip-link);
   --font-sans: var(--font-nunito), system-ui, sans-serif;
   --font-display: var(--font-fredoka), var(--font-nunito), system-ui, sans-serif;
 }
