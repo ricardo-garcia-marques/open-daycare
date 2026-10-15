@@ -71,7 +71,7 @@ function KidCard({ kid }: { kid: Kid }) {
       </div>
       {showAllergyBadge ? (
         <span className="flex-none text-[11px] font-extrabold py-[5px] px-[9px] rounded-full bg-chip-allergy-bg text-chip-allergy uppercase">
-          {kid.allergies[0]}
+          {kid.allergies[0].toUpperCase()}
         </span>
       ) : showLinkBadge ? (
         <span className="flex-none text-[11px] font-extrabold py-[5px] px-[9px] rounded-full bg-chip-link-bg text-chip-link">

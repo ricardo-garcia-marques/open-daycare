@@ -1,6 +1,6 @@
 # SPEC 02 — Pantalla Niños (/kids)
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01
 > **Fecha:** 2026-10-15
 > **Objetivo:** Portar el mockup `references/pantallas/ninos.dc.html` como la ruta `/kids` con estilos idénticos, buscador funcional en cliente y navegación conectada al resto de la app.
@@ -55,14 +55,14 @@ El texto "N años · N padres vinculados / sin padres vinculados" se deriva de l
 
 ## Criterios de aceptación
 
-- [ ] `/kids` renderiza sin errores de consola.
-- [ ] `/ninos` ya no existe (404) y el sidebar enlaza a `/kids`.
-- [ ] En `/kids` el item "Niños" del sidebar está resaltado (fondo `#FBE3D8`) y Feed no.
-- [ ] Aparecen exactamente los 8 niños del mockup con nombre, edad y padres vinculados idénticos.
-- [ ] Los badges correctos: MANÍ en Mateo, LACTOSA en Tomás, VINCULAR en Valentina, chevron en el resto.
-- [ ] Escribir en el buscador filtra la lista según el texto (case-insensitive); limpiar el input restaura los 8.
-- [ ] Las tarjetas enlazan a `/kids/{id}` y "Agregar niño" a `/kids/agregar`; ambos muestran "pantalla pendiente".
-- [ ] `npm run lint` y `npx tsc --noEmit` pasan sin errores.
+- [x] `/kids` renderiza sin errores de consola.
+- [x] `/ninos` ya no existe (404) y el sidebar enlaza a `/kids`.
+- [x] En `/kids` el item "Niños" del sidebar está resaltado (fondo `#FBE3D8`) y Feed no.
+- [x] Aparecen exactamente los 8 niños del mockup con nombre, edad y padres vinculados idénticos.
+- [x] Los badges correctos: MANÍ en Mateo, LACTOSA en Tomás, VINCULAR en Valentina, chevron en el resto.
+- [x] Escribir en el buscador filtra la lista según el texto (case-insensitive); limpiar el input restaura los 8.
+- [x] Las tarjetas enlazan a `/kids/{id}` y "Agregar niño" a `/kids/agregar`; ambos muestran "pantalla pendiente".
+- [x] `npm run lint` y `npx tsc --noEmit` pasan sin errores.
 
 ## Decisiones
 
