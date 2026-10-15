@@ -1,6 +1,6 @@
 # SPEC 03 — Pantalla Perfil del Niño (/kids/[id])
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 02
 > **Fecha:** 2026-10-15
 > **Objetivo:** Portar el mockup `references/pantallas/perfil-nino.dc.html` como la ruta `/kids/[id]` con datos dinámicos para los 8 niños, padres vinculados detallados y navegación completa vía stubs.
