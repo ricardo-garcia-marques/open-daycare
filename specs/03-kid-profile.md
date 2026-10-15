@@ -68,16 +68,16 @@ Todo el código (tipos, campos, componentes, variables) va en inglés según las
 
 ## Criterios de aceptación
 
-- [ ] `/kids/mateo-fernandez` renderiza sin errores de consola y coincide con el mockup (colores, tipografía, layout 2 columnas).
-- [ ] "Volver a Niños" navega a `/kids` y el sidebar resalta Niños.
-- [ ] Mateo muestra la card de alergias con el texto exacto "Alergia al maní. Evitar frutos secos. Lleva inhalador en la mochila.".
-- [ ] Mateo muestra 2 padres: Lucía (badge ACTIVA) y Diego (badge PENDIENTE, "invitación enviada").
-- [ ] Los 8 niños tienen perfil funcional con sus propios datos (nombre, edad, sala, ingreso, padres).
-- [ ] Un niño sin alergias ni notas no muestra la card roja.
-- [ ] "Editar", "Vincular otro padre" y "Resumen del día" navegan a sus stubs "pantalla pendiente".
-- [ ] `/kids/xxx` (id inexistente) muestra 404 en vez de romper.
-- [ ] `/kids` sigue mostrando el contador correcto de padres vinculados por niño (derivado de la nueva estructura).
-- [ ] `npm run lint` y `npx tsc --noEmit` pasan sin errores.
+- [x] `/kids/mateo-fernandez` renderiza sin errores de consola y coincide con el mockup (colores, tipografía, layout 2 columnas).
+- [x] "Volver a Niños" navega a `/kids` y el sidebar resalta Niños.
+- [x] Mateo muestra la card de alergias con el texto exacto "Alergia al maní. Evitar frutos secos. Lleva inhalador en la mochila.".
+- [x] Mateo muestra 2 padres: Lucía (badge ACTIVA) y Diego (badge PENDIENTE, "invitación enviada").
+- [x] Los 8 niños tienen perfil funcional con sus propios datos (nombre, edad, sala, ingreso, padres).
+- [x] Un niño sin alergias ni notas no muestra la card roja.
+- [x] "Editar", "Vincular otro padre" y "Resumen del día" navegan a sus stubs "pantalla pendiente".
+- [x] `/kids/xxx` (id inexistente) muestra 404 en vez de romper.
+- [x] `/kids` sigue mostrando el contador correcto de padres vinculados por niño (derivado de la nueva estructura).
+- [x] `npm run lint` y `npx tsc --noEmit` pasan sin errores.
 
 ## Decisiones
 

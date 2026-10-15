@@ -217,6 +217,8 @@ function KidProfileContent({ kid }: { kid: Kid }) {
   );
 }
 
+export const instant = false;
+
 export function generateStaticParams() {
   return KIDS.map((kid) => ({ id: kid.id }));
 }
