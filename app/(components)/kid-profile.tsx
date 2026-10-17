@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { useState } from "react";
 import { Sidebar } from "./sidebar";
 import { AddKidModal, type AddKidModalMode } from "./add-kid-modal";
+import { LinkParentModal } from "./link-parent-modal";
 import { useKidsStore } from "@/lib/kids-store";
 import type { LinkedParent } from "@/lib/mock-kids";
 
@@ -130,6 +131,7 @@ function ParentRow({ parent }: { parent: LinkedParent }) {
 export function KidProfile({ kidId }: { kidId: string }) {
   const { hydrated, getKidById } = useKidsStore();
   const [modalMode, setModalMode] = useState<AddKidModalMode | null>(null);
+  const [linkParentOpen, setLinkParentOpen] = useState(false);
 
   const kid = getKidById(kidId);
 
@@ -226,9 +228,10 @@ export function KidProfile({ kidId }: { kidId: string }) {
                   {kid.linkedParents.map((parent) => (
                     <ParentRow key={parent.name} parent={parent} />
                   ))}
-                  <Link
-                    href={`/kids/${kid.id}/vincular-padre`}
-                    className="flex items-center gap-3 pt-2"
+                  <button
+                    type="button"
+                    onClick={() => setLinkParentOpen(true)}
+                    className="flex items-center gap-3 pt-2 cursor-pointer"
                   >
                     <span className="w-10 h-10 rounded-full border-[1.5px] border-dashed border-[#D8CBBA] flex items-center justify-center text-[#B0A290] flex-none">
                       <PlusIcon />
@@ -236,7 +239,7 @@ export function KidProfile({ kidId }: { kidId: string }) {
                     <span className="font-extrabold text-[14.5px] text-primary-strong">
                       Vincular otro padre
                     </span>
-                  </Link>
+                  </button>
                 </div>
               </div>
             </div>
@@ -245,6 +248,8 @@ export function KidProfile({ kidId }: { kidId: string }) {
       </main>
 
       {modalMode ? <AddKidModal mode={modalMode} onClose={() => setModalMode(null)} /> : null}
+
+      {linkParentOpen ? <LinkParentModal kid={kid} onClose={() => setLinkParentOpen(false)} /> : null}
     </div>
   );
 }
