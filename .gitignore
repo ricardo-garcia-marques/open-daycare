@@ -46,3 +46,5 @@ next-env.d.ts
 # env files
 .env*
 !.env.template
+# Supabase CLI temp
+supabase/.temp/
