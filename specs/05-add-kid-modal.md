@@ -60,18 +60,18 @@ Estado local efímero del formulario (client component, no persiste):
 
 ## Criterios de aceptación
 
-- [x] El botón "Agregar niño" de `/kids` y el de `/kids/[id]` abren el modal; ya no navegan a `/kids/agregar` y esa ruta devuelve 404.
-- [x] El modal coincide con el mockup (card `#FBF4EC` radio 24px, cabecera Cancelar/Agregar niño/Guardar con los colores del mockup, 4 campos con sus estilos).
-- [x] La fecha auto-inserta `/` y acepta solo dígitos mientras se escribe.
-- [x] `31/02/2023`, `05/13/2025` y una fecha futura muestran mensaje de error visible y **Guardar queda deshabilitado** (no cierra ni guarda).
-- [x] Con fecha completa, real y pasada, Guardar se habilita y guarda normalmente.
-- [x] SALA es un select nativo con Soles/Estrellas/Luna y arranca en "Soles".
-- [x] Guardar cierra el modal, el niño aparece al principio de `/kids` y sigue ahí tras recargar (localStorage `opendaycare:kids:v1`).
-- [x] Escribir "Maní, Lactosa" en ALERGIAS produce `allergies: ["Maní", "Lactosa"]`, visible en el perfil del niño.
-- [x] El nuevo niño tiene id-slug, initial y avatar derivados, `enrolledAt` del mes actual y 0 padres vinculados; su `/kids/[id]` funciona.
-- [x] "Editar" en `/kids/[id]` abre el modal precargado con título "Editar niño"; Guardar actualiza y persiste tras recargar.
-- [x] Cancelar, Escape y click en backdrop cierran el modal sin guardar y sin confirmación.
-- [x] `npm run lint` y `npx tsc --noEmit` pasan sin errores.
+- [x] <!-- PASS: app/kids/page.tsx:48 y app/(components)/kid-profile.tsx:182 abren AddKidModal; /kids/agregar devuelve 404 (evidencia: .playwright-mcp/spec-05-404-agregar.png) --> El botón "Agregar niño" de `/kids` y el de `/kids/[id]` abren el modal; ya no navegan a `/kids/agregar` y esa ruta devuelve 404.
+- [x] <!-- PASS: Card #FBF4EC radio 24px max-w 520px verificado con evaluate en Playwright; cabecera Cancelar #94887B, título Fredoka 600, Guardar #D9583C; 4 campos según diseño (evidencia: app/(components)/add-kid-modal.tsx, .playwright-mcp/spec-05-modal-empty.png) --> El modal coincide con el mockup (card `#FBF4EC` radio 24px, cabecera Cancelar/Agregar niño/Guardar con los colores del mockup, 4 campos con sus estilos).
+- [x] <!-- PASS: app/(components)/add-kid-modal.tsx:55 maskBirthDateInput descarta letras e inserta slashes automáticamente al tipear dígitos (evidencia: .playwright-mcp/spec-05-modal-filled.png) --> La fecha auto-inserta `/` y acepta solo dígitos mientras se escribe.
+- [x] <!-- PASS: 31/02/2023 muestra 'Esa fecha no existe en el calendario.' (.playwright-mcp/spec-05-invalid-date-31-02-2023.png); 15/12/2030 muestra 'La fecha de nacimiento no puede ser futura.' (.playwright-mcp/spec-05-future-date.png); validateBirthDate('05/13/2025') valida mes > 12; Guardar permanece disabled --> `31/02/2023`, `05/13/2025` y una fecha futura muestran mensaje de error visible y **Guardar queda deshabilitado** (no cierra ni guarda).
+- [x] <!-- PASS: Con fecha completa, real y pasada (12/03/2022) y nombre no vacío, Guardar se habilita y persiste la entidad (evidencia: .playwright-mcp/spec-05-modal-filled.png) --> Con fecha completa, real y pasada, Guardar se habilita y guarda normalmente.
+- [x] <!-- PASS: select nativo en app/(components)/add-kid-modal.tsx:229-244 con opciones Soles, Estrellas, Luna; seleccionado Soles por defecto --> SALA es un select nativo con Soles/Estrellas/Luna y arranca en "Soles".
+- [x] <!-- PASS: Guardar cierra el modal, la card aparece primera en /kids y se mantiene tras F5 desde opendaycare:kids:v1 (evidencia: .playwright-mcp/spec-05-kids-list-persisted.png) --> Guardar cierra el modal, el niño aparece al principio de `/kids` y sigue ahí tras recargar (localStorage `opendaycare:kids:v1`).
+- [x] <!-- PASS: lib/kids-store.tsx:103 parsea split(',') a array; guardado en store como ['Maní', 'Lactosa']; precargado al pulsar Editar en perfil (.playwright-mcp/spec-05-modal-edit.png) y badge MANÍ visible en card --> Escribir "Maní, Lactosa" en ALERGIAS produce `allergies: ["Maní", "Lactosa"]`, visible en el perfil del niño.
+- [x] <!-- PASS: Derivados id 'martina-lopez', initial 'M', paleta avatar, enrolledAt 'oct 2026', 0 padres; perfil /kids/martina-lopez renderiza con éxito (evidencia: .playwright-mcp/spec-05-profile-new-kid.png) --> El nuevo niño tiene id-slug, initial y avatar derivados, `enrolledAt` del mes actual y 0 padres vinculados; su `/kids/[id]` funciona.
+- [x] <!-- PASS: Editar abre modal con título 'Editar niño' y datos precargados; guardar cambios de sala y notas persiste tras F5 (evidencia: .playwright-mcp/spec-05-modal-edit.png, .playwright-mcp/spec-05-profile-edited-persisted.png) --> "Editar" en `/kids/[id]` abre el modal precargado con título "Editar niño"; Guardar actualiza y persiste tras recargar.
+- [x] <!-- PASS: Botón Cancelar, tecla Escape y click en backdrop verificados en Playwright cerrando el diálogo sin alterar estado ni confirmación --> Cancelar, Escape y click en backdrop cierran el modal sin guardar y sin confirmación.
+- [x] <!-- PASS: npm run lint y npx tsc --noEmit ejecutados sin errores --> `npm run lint` y `npx tsc --noEmit` pasan sin errores.
 
 ## Decisiones
 
