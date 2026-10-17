@@ -1,6 +1,6 @@
 # SPEC 04 — Pantallas Login (/login) y Activar cuenta (/activate-account)
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01
 > **Fecha:** 2026-10-17
 > **Objetivo:** Portar los mockups `references/pantallas/login.dc.html` (sin el selector Personal/Familia) y `activar-cuenta.dc.html` como rutas `/login` y `/activate-account`, a pantalla completa y sin sidebar.
