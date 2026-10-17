@@ -77,7 +77,14 @@ function hydrateStore() {
 
 function persistPosts(posts: StoredPost[]) {
   try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
+    const serializable = posts.map((post) => {
+      if (!post.photoUrls) {
+        return post;
+      }
+      const persisted: StoredPost = { ...post, photoUrls: undefined };
+      return persisted;
+    });
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(serializable));
   } catch {
     // localStorage unavailable: the posts list still updates in memory.
   }

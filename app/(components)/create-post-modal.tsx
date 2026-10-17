@@ -109,24 +109,28 @@ export function CreatePostModal({
     }
   }, [photos.length]);
 
-  const handleFilesChosen = useCallback(
-    (files: FileList | null) => {
-      if (!files) {
-        return;
+  const handleFilesChosen = useCallback((files: FileList | null) => {
+    if (!files || files.length === 0) {
+      return;
+    }
+    // Object URLs must be created synchronously: the FileList is emptied as
+    // soon as the input value is reset, before React runs state updaters.
+    const newUrls: string[] = [];
+    for (const file of Array.from(files)) {
+      newUrls.push(URL.createObjectURL(file));
+    }
+    setPhotos((current) => {
+      const room = MAX_PHOTOS - current.length;
+      if (room <= 0) {
+        return current;
       }
-      setPhotos((current) => {
-        const next = [...current];
-        for (const file of Array.from(files)) {
-          if (next.length >= MAX_PHOTOS) {
-            break;
-          }
-          next.push(URL.createObjectURL(file));
-        }
-        return next;
-      });
-    },
-    []
-  );
+      const kept = newUrls.slice(0, room);
+      for (const url of newUrls.slice(room)) {
+        URL.revokeObjectURL(url);
+      }
+      return [...current, ...kept];
+    });
+  }, []);
 
   const removePhoto = useCallback((index: number) => {
     setPhotos((current) => current.filter((_, i) => i !== index));
