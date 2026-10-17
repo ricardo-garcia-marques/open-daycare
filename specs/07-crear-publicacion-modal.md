@@ -1,6 +1,6 @@
 # SPEC 07 — Modal Nueva publicación
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01, SPEC 02, SPEC 06
 > **Fecha:** 2026-10-17
 > **Objetivo:** Modal "Nueva publicación" (mockup `references/pantallas/crear-publicacion.dc.html`) que crea una publicación real, persistida en localStorage, que aparece arriba del feed `/` al publicar.
@@ -71,18 +71,18 @@ Seed: `FEED_POSTS` de `lib/mock-feed.ts` cuando no hay nada en localStorage (el 
 
 ## Criterios de aceptación
 
-- [ ] El modal abre desde el botón "Nueva publicación" de la sidebar y desde la card "Compartí un momento…"; la ruta `/crear-publicacion` ya no existe (404).
-- [ ] El modal coincide con el mockup (card 580px `#FBF4EC` radio 24px, cabecera Cancelar/título/Publicar en `#D9583C`, secciones PARA/TIPO/DESCRIPCIÓN/FOTOS).
-- [ ] PARA permite multi-selección de niños con avatares y "Toda la sala" limpia la selección individual (y viceversa).
-- [ ] Los 7 tipos del mockup están con sus colores exactos y arrancan deseleccionados; la selección es única.
-- [ ] "Publicar" está deshabilitado sin tipo, sin descripción o sin destinatario, y se habilita al completar los tres.
-- [ ] Agregar foto(s) muestra miniaturas de 96px; clic sobre una miniatura la elimina; máximo 4.
-- [ ] Publicar cierra el modal, el post nuevo aparece primero en el feed con autor "Caro Giménez", hora actual, badge del tipo y destinatarios correctos (`toda la sala` / `familia de X` / `familias de X, Y`).
-- [ ] Tras F5 el post persiste (localStorage `opendaycare:posts:v1`) y sus fotos se muestran como placeholder dashed "{N} foto(s)".
-- [ ] Los 3 posts del mock siguen visibles como seed cuando no hay localStorage.
-- [ ] Los enlaces "Editar" ya no aparecen en las cards del feed.
-- [ ] Cancelar, Escape y click en backdrop cierran el modal sin guardar ni pedir confirmación.
-- [ ] `npm run lint` y `npx tsc --noEmit` pasan sin errores.
+- [x] El modal abre desde el botón "Nueva publicación" de la sidebar y desde la card "Compartí un momento…"; la ruta `/crear-publicacion` ya no existe (404).
+- [x] El modal coincide con el mockup (card 580px `#FBF4EC` radio 24px, cabecera Cancelar/título/Publicar en `#D9583C`, secciones PARA/TIPO/DESCRIPCIÓN/FOTOS).
+- [x] PARA permite multi-selección de niños con avatares y "Toda la sala" limpia la selección individual (y viceversa).
+- [x] Los 7 tipos del mockup están con sus colores exactos y arrancan deseleccionados; la selección es única.
+- [x] "Publicar" está deshabilitado sin tipo, sin descripción o sin destinatario, y se habilita al completar los tres.
+- [x] Agregar foto(s) muestra miniaturas de 96px; clic sobre una miniatura la elimina; máximo 4.
+- [x] Publicar cierra el modal, el post nuevo aparece primero en el feed con autor "Caro Giménez", hora actual, badge del tipo y destinatarios correctos (`toda la sala` / `familia de X` / `familias de X, Y`).
+- [x] Tras F5 el post persiste (localStorage `opendaycare:posts:v1`) y sus fotos se muestran como placeholder dashed "{N} foto(s)".
+- [x] Los 3 posts del mock siguen visibles como seed cuando no hay localStorage.
+- [x] Los enlaces "Editar" ya no aparecen en las cards del feed.
+- [x] Cancelar, Escape y click en backdrop cierran el modal sin guardar ni pedir confirmación.
+- [x] `npm run lint` y `npx tsc --noEmit` pasan sin errores.
 
 ## Decisiones
 
