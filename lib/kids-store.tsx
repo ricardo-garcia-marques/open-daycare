@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useSyncExternalStore, type ReactNode } from "react";
-import { KIDS, type Kid } from "@/lib/mock-kids";
+import { KIDS, type Kid, type LinkedParent } from "@/lib/mock-kids";
 
 const STORAGE_KEY = "opendaycare:kids:v1";
 
@@ -128,6 +128,7 @@ type KidsStoreValue = {
   hydrated: boolean;
   saveKid: (formData: KidFormData, kidId?: string) => void;
   getKidById: (id: string) => Kid | undefined;
+  addLinkedParent: (kidId: string, parent: { name: string; role: string }) => void;
 };
 
 let storeSnapshot: { kids: Kid[]; hydrated: boolean } = {
@@ -204,9 +205,39 @@ export function KidsStoreProvider({ children }: { children: ReactNode }) {
     [store.kids]
   );
 
+  const addLinkedParent = useCallback(
+    (kidId: string, parent: { name: string; role: string }) => {
+      const trimmedName = parent.name.trim();
+      const paletteEntry =
+        AVATAR_PALETTE[Math.abs(hashCode(trimmedName)) % AVATAR_PALETTE.length];
+      const linkedParent: LinkedParent = {
+        name: trimmedName,
+        role: parent.role,
+        status: "pending",
+        initial: trimmedName.charAt(0).toUpperCase(),
+        ...paletteEntry,
+      };
+      const nextKids = storeSnapshot.kids.map((candidate) =>
+        candidate.id === kidId
+          ? {
+              ...candidate,
+              linkedParents: [...candidate.linkedParents, linkedParent],
+            }
+          : candidate
+      );
+      try {
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(nextKids));
+      } catch {
+        // localStorage unavailable: the kids list still updates in memory.
+      }
+      emitStoreChange({ kids: nextKids, hydrated: true });
+    },
+    []
+  );
+
   const value = useMemo(
-    () => ({ kids: store.kids, hydrated: store.hydrated, saveKid, getKidById }),
-    [store, saveKid, getKidById]
+    () => ({ kids: store.kids, hydrated: store.hydrated, saveKid, getKidById, addLinkedParent }),
+    [store, saveKid, getKidById, addLinkedParent]
   );
 
   return (
