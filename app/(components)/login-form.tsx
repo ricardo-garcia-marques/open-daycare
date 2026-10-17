@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useState } from "react";
 
 const initialEmail = "caro@opendaycare.com";
@@ -53,6 +54,16 @@ export function LoginForm() {
       >
         Iniciar sesión
       </button>
+
+      <p className="text-center mt-[24px] m-0 text-muted text-[14.5px]">
+        ¿Te invitó la guardería?{" "}
+        <Link
+          href="/activate-account"
+          className="text-primary-strong font-extrabold"
+        >
+          Activá tu cuenta
+        </Link>
+      </p>
     </div>
   );
 }
