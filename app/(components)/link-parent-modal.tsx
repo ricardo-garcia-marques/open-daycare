@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Kid } from "@/lib/mock-kids";
+import { useKidsStore } from "@/lib/kids-store";
 
 const INVITATION_CODE = "7K4P9";
 
@@ -66,18 +67,56 @@ function SendIcon() {
   );
 }
 
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function normalizeParentName(name: string): string {
+  return name.trim().toLowerCase();
+}
+
 export function LinkParentModal({
   kid,
   onClose,
+  onSubmit,
 }: {
   kid: Kid;
   onClose: () => void;
+  onSubmit: (parent: { name: string; role: string }) => void;
 }) {
+  const { kids } = useKidsStore();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [relationship, setRelationship] = useState<
     (typeof RELATIONSHIP_OPTIONS)[number] | null
   >(null);
+
+  const trimmedName = name.trim();
+  const emailError = useMemo(() => {
+    if (!email.trim()) {
+      return null;
+    }
+    return EMAIL_PATTERN.test(email.trim())
+      ? null
+      : "Ingresá un email válido (ej. nombre@correo.com).";
+  }, [email]);
+  const duplicateError = useMemo(() => {
+    if (!trimmedName) {
+      return null;
+    }
+    const currentKid = kids.find((candidate) => candidate.id === kid.id);
+    const isDuplicate = (currentKid?.linkedParents ?? []).some(
+      (parent) =>
+        normalizeParentName(parent.name) === normalizeParentName(trimmedName)
+    );
+    return isDuplicate
+      ? "Esa persona ya está vinculada a este niño."
+      : null;
+  }, [kids, kid.id, trimmedName]);
+
+  const canSubmit =
+    trimmedName.length > 0 &&
+    !emailError &&
+    relationship !== null &&
+    !duplicateError;
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -135,8 +174,15 @@ export function LinkParentModal({
             value={name}
             onChange={(event) => setName(event.target.value)}
             placeholder="Ej. Diego Fernández"
-            className={`${FIELD_INPUT_CLASS} border-[#EADFD0] mb-[18px]`}
+            className={`${FIELD_INPUT_CLASS} ${
+              duplicateError ? "border-[#D9583C]" : "border-[#EADFD0]"
+            } mb-[18px]`}
           />
+          {duplicateError ? (
+            <p className="-mt-3 mb-[10px] text-[12.5px] font-bold text-[#C5413A]">
+              {duplicateError}
+            </p>
+          ) : null}
 
           <div className={FIELD_LABEL_CLASS}>EMAIL</div>
           <input
@@ -144,8 +190,15 @@ export function LinkParentModal({
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             placeholder="correo@ejemplo.com"
-            className={`${FIELD_INPUT_CLASS} border-[#EADFD0] mb-[18px]`}
+            className={`${FIELD_INPUT_CLASS} ${
+              emailError ? "border-[#D9583C]" : "border-[#EADFD0]"
+            } mb-[18px]`}
           />
+          {emailError ? (
+            <p className="-mt-3 mb-[10px] text-[12.5px] font-bold text-[#C5413A]">
+              {emailError}
+            </p>
+          ) : null}
 
           <div className={`${FIELD_LABEL_CLASS} mb-[10px]`}>PARENTESCO</div>
           <div className="flex gap-[9px] mb-5">
@@ -182,7 +235,18 @@ export function LinkParentModal({
 
           <button
             type="button"
-            className="flex items-center justify-center gap-[9px] w-full py-[14px] rounded-[14px] bg-[linear-gradient(180deg,#F4977E,#EE8164)] text-white font-extrabold text-[15.5px] shadow-[0_10px_22px_-8px_rgba(238,129,100,0.7)]"
+            disabled={!canSubmit}
+            onClick={() => {
+              if (!canSubmit || relationship === null) {
+                return;
+              }
+              onSubmit({ name: trimmedName, role: relationship });
+            }}
+            className={`flex items-center justify-center gap-[9px] w-full py-[14px] rounded-[14px] text-white font-extrabold text-[15.5px] bg-[linear-gradient(180deg,#F4977E,#EE8164)] ${
+              canSubmit
+                ? "shadow-[0_10px_22px_-8px_rgba(238,129,100,0.7)] cursor-pointer"
+                : "opacity-40 cursor-not-allowed shadow-none"
+            }`}
           >
             <SendIcon />
             Enviar invitación

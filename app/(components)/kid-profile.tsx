@@ -129,7 +129,7 @@ function ParentRow({ parent }: { parent: LinkedParent }) {
 }
 
 export function KidProfile({ kidId }: { kidId: string }) {
-  const { hydrated, getKidById } = useKidsStore();
+  const { hydrated, getKidById, addLinkedParent } = useKidsStore();
   const [modalMode, setModalMode] = useState<AddKidModalMode | null>(null);
   const [linkParentOpen, setLinkParentOpen] = useState(false);
 
@@ -249,7 +249,16 @@ export function KidProfile({ kidId }: { kidId: string }) {
 
       {modalMode ? <AddKidModal mode={modalMode} onClose={() => setModalMode(null)} /> : null}
 
-      {linkParentOpen ? <LinkParentModal kid={kid} onClose={() => setLinkParentOpen(false)} /> : null}
+      {linkParentOpen ? (
+        <LinkParentModal
+          kid={kid}
+          onClose={() => setLinkParentOpen(false)}
+          onSubmit={(parent) => {
+            addLinkedParent(kid.id, parent);
+            setLinkParentOpen(false);
+          }}
+        />
+      ) : null}
     </div>
   );
 }
