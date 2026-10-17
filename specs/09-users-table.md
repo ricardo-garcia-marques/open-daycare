@@ -1,6 +1,6 @@
 # SPEC 09 — Tabla `users`, enums y perfil vía trigger
 
-> **Estado:** Approved
+> **Estado:** Implementado
 > **Depende de:** SPEC 08 (tabla `daycares` + patrón de migraciones)
 > **Fecha:** 2026-10-17
 > **Objetivo:** Crear la tabla `users` con sus enums `user_role`/`user_status`, cerrar la deuda RLS del spec 08 (pertenencia por `daycare_id` en `daycares` y `users`), añadir el trigger de perfil desde `auth.users` y sembrar un usuario staff de prueba — todo en migraciones `0002`/`0003` aplicadas al remoto.
@@ -85,15 +85,15 @@ values ('00000000-0000-0000-0000-00000000000a', 'staff@opendaycare.test',
 
 ## Criterios de aceptación
 
-- [ ] `public.user_role` y `public.user_status` existen con los valores del diccionario.
-- [ ] `public.users` existe con todas las columnas del diccionario, FK a `auth.users(id)` on delete cascade y FK a `daycares`.
-- [ ] RLS habilitado en `users` con políticas: propia fila (select/update), staff lee usuarios de su daycare, sin política pública de insert/delete.
-- [ ] `daycares` ya no tiene la política `USING (true)`; su select filtra por `user_daycare_id()`.
-- [ ] El helper `public.user_daycare_id()` existe, es `security definer`, `stable` y con `search_path` fijado.
-- [ ] Trigger `on_auth_user_created` existe y un insert de prueba en `auth.users` crea la fila de perfil correspondiente.
-- [ ] Existe el usuario staff `staff@opendaycare.test` (id `…000a`) con perfil `role='staff'`, `daycare_id = …0001`, `status='active'`, y su password autentica.
-- [ ] Migraciones `0002` y `0003` registradas en el historial remoto; `db push` idempotente.
-- [ ] Advisors security/performance sin hallazgos nuevos atribuibles a estas migraciones.
+- [x] `public.user_role` y `public.user_status` existen con los valores del diccionario.
+- [x] `public.users` existe con todas las columnas del diccionario, FK a `auth.users(id)` on delete cascade y FK a `daycares`.
+- [x] RLS habilitado en `users` con políticas: propia fila (select/update), staff lee usuarios de su daycare, sin política pública de insert/delete. (Nota: las dos políticas SELECT se fusionaron en `users_select_own_or_staff_same_daycare` en `0005` tras el hallazgo `multiple_permissive_policies`.)
+- [x] `daycares` ya no tiene la política `USING (true)`; su select filtra por `user_daycare_id()`.
+- [x] El helper `public.user_daycare_id()` existe, es `security definer`, `stable` y con `search_path` fijado. (`0004` revocó EXECUTE a `anon`/`public` tras el hallazgo del advisor.)
+- [x] Trigger `on_auth_user_created` existe y un insert de prueba en `auth.users` crea la fila de perfil correspondiente (verificado con transacción abortada a propósito; 0 filas restantes).
+- [x] Existe el usuario staff `staff@opendaycare.test` (id `…000a`) con perfil `role='staff'`, `daycare_id = …0001`, `status='active'`, y su password autentica (login GoReal verificado vía `/auth/v1/token`).
+- [x] Migraciones `0002` y `0003` registradas en el historial remoto; `db push` idempotente ("Remote database is up to date").
+- [x] Advisors security/performance sin hallazgos nuevos atribuibles a estas migraciones (hardening en `0004`, perf de políticas en `0005`; quedan solo hallazgos preexistentes: `rls_auto_enable`, leaked-password protection, y el INFO `unused_index` esperado).
 
 ## Decisiones
 
