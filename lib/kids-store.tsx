@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useSyncExternalStore, type ReactNode } from "react";
 import { KIDS, type Kid } from "@/lib/mock-kids";
 
 const STORAGE_KEY = "opendaycare:kids:v1";
@@ -130,48 +130,78 @@ type KidsStoreValue = {
   getKidById: (id: string) => Kid | undefined;
 };
 
+let storeSnapshot: { kids: Kid[]; hydrated: boolean } = {
+  kids: KIDS,
+  hydrated: false,
+};
+
+const storeListeners = new Set<() => void>();
+
+function emitStoreChange(next: { kids: Kid[]; hydrated: boolean }) {
+  storeSnapshot = next;
+  for (const listener of storeListeners) {
+    listener();
+  }
+}
+
+function subscribeToStore(listener: () => void): () => void {
+  storeListeners.add(listener);
+  return () => storeListeners.delete(listener);
+}
+
+function getStoreSnapshot(): { kids: Kid[]; hydrated: boolean } {
+  return storeSnapshot;
+}
+
+function getServerStoreSnapshot(): { kids: Kid[]; hydrated: boolean } {
+  return { kids: KIDS, hydrated: false };
+}
+
+function hydrateStore() {
+  if (!storeSnapshot.hydrated) {
+    emitStoreChange({ kids: readStoredKids() ?? KIDS, hydrated: true });
+  }
+}
+
 const KidsStoreContext = createContext<KidsStoreValue | null>(null);
 
 export function KidsStoreProvider({ children }: { children: ReactNode }) {
-  const [kids, setKids] = useState<Kid[]>(KIDS);
-  const [hydrated, setHydrated] = useState(false);
+  const store = useSyncExternalStore(
+    subscribeToStore,
+    getStoreSnapshot,
+    getServerStoreSnapshot
+  );
 
   useEffect(() => {
-    const stored = readStoredKids();
-    if (stored) {
-      setKids(stored);
-    }
-    setHydrated(true);
+    hydrateStore();
   }, []);
 
   const saveKid = useCallback((formData: KidFormData, kidId?: string) => {
-    setKids((currentKids) => {
-      const kid = buildKidFromForm(formData);
-      let nextKids: Kid[];
-      if (kidId) {
-        nextKids = currentKids.map((candidate) =>
-          candidate.id === kidId ? kid : candidate
-        );
-      } else {
-        nextKids = [kid, ...currentKids.filter((c) => c.id !== kid.id)];
-      }
-      try {
-        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(nextKids));
-      } catch {
-        // localStorage unavailable: the kids list still updates in memory.
-      }
-      return nextKids;
-    });
+    const kid = buildKidFromForm(formData);
+    let nextKids: Kid[];
+    if (kidId) {
+      nextKids = storeSnapshot.kids.map((candidate) =>
+        candidate.id === kidId ? kid : candidate
+      );
+    } else {
+      nextKids = [kid, ...storeSnapshot.kids.filter((c) => c.id !== kid.id)];
+    }
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(nextKids));
+    } catch {
+      // localStorage unavailable: the kids list still updates in memory.
+    }
+    emitStoreChange({ kids: nextKids, hydrated: true });
   }, []);
 
   const getKidById = useCallback(
-    (id: string) => kids.find((candidate) => candidate.id === id),
-    [kids]
+    (id: string) => store.kids.find((candidate) => candidate.id === id),
+    [store.kids]
   );
 
   const value = useMemo(
-    () => ({ kids, hydrated, saveKid, getKidById }),
-    [kids, hydrated, saveKid, getKidById]
+    () => ({ kids: store.kids, hydrated: store.hydrated, saveKid, getKidById }),
+    [store, saveKid, getKidById]
   );
 
   return (
