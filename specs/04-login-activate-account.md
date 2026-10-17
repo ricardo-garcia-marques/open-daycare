@@ -49,18 +49,18 @@ Esta feature no introduce nuevas estructuras de datos: no hay mock que extender 
 
 ## Criterios de aceptación
 
-- [ ] `/login` renderiza sin errores de consola y coincide con el mockup (colores, tipografías Fredoka/Nunito, panel izquierdo con gradiente y círculos).
-- [ ] `/login` NO muestra el bloque "INGRESO COMO" (Personal/Familia).
-- [ ] Los inputs de email y contraseña de `/login` aceptan texto y arrancan con el email `caro@opendaycare.com` precargado.
-- [ ] El botón "Iniciar sesión" navega a `/` (Feed) sin validación.
-- [ ] "¿Te invitó la guardería? Activá tu cuenta" navega a `/activate-account`.
-- [ ] `/activate-account` renderiza sin errores de consola y coincide con el mockup (card "Mateo · Sala Soles", código `7K4P9`, checkbox verde marcado).
-- [ ] El checkbox de consentimiento se marca/desmarca al hacer clic.
-- [ ] El botón "Activar mi cuenta" navega a `/login` sin validación.
-- [ ] "¿Ya tenés cuenta? Iniciar sesión" navega a `/login`.
-- [ ] Ni `/login` ni `/activate-account` muestran el sidebar.
-- [ ] "¿Olvidaste tu contraseña?" es visual pero no navega a ninguna página.
-- [ ] `npm run lint` y `npx tsc --noEmit` pasan sin errores.
+- [x] `/login` renderiza sin errores de consola y coincide con el mockup (colores, tipografías Fredoka/Nunito, panel izquierdo con gradiente y círculos). <!-- PASS: 0 errores consola en .playwright-mcp/spec-04-login-console.log; panel con gradiente 155deg rgb(246,169,142)->rgb(236,126,98), 2 círculos bg-white/10, tipografía Fredoka/Nunito, captura en .playwright-mcp/spec-04-login.png -->
+- [x] `/login` NO muestra el bloque "INGRESO COMO" (Personal/Familia). <!-- PASS: evaluado en DOM y snapshot .playwright-mcp/spec-04-login-snapshot.yml; no existen elementos ni textos de selector de rol -->
+- [x] Los inputs de email y contraseña de `/login` aceptan texto y arrancan con el email `caro@opendaycare.com` precargado. <!-- PASS: input email inicia con "caro@opendaycare.com", password vacío; ambos aceptan texto interactivo vía useState -->
+- [x] El botón "Iniciar sesión" navega a `/` (Feed) sin validación. <!-- PASS: click en botón navega a http://localhost:3000/ incluso con contraseña vacía -->
+- [x] "¿Te invitó la guardería? Activá tu cuenta" navega a `/activate-account`. <!-- PASS: click en enlace navega a http://localhost:3000/activate-account -->
+- [x] `/activate-account` renderiza sin errores de consola y coincide con el mockup (card "Mateo · Sala Soles", código `7K4P9`, checkbox verde marcado). <!-- PASS: 0 errores consola en .playwright-mcp/spec-04-activate-account-console.log; avatar M rgb(169,217,232)/rgb(31,122,147), código Fredoka letter-spacing 3px, checkbox rgb(95,185,126) y label rgb(251,241,214), captura en .playwright-mcp/spec-04-activate-account.png -->
+- [x] El checkbox de consentimiento se marca/desmarca al hacer clic. <!-- PASS: inicia en true; click en label pasa a false; segundo click regresa a true -->
+- [x] El botón "Activar mi cuenta" navega a `/login` sin validación. <!-- PASS: enlace/botón navega directamente a http://localhost:3000/login -->
+- [x] "¿Ya tenés cuenta? Iniciar sesión" navega a `/login`. <!-- PASS: enlace en footer navega a http://localhost:3000/login -->
+- [x] Ni `/login` ni `/activate-account` muestran el sidebar. <!-- PASS: document.querySelector('aside') es null en ambas rutas, layout full-screen sin sidebar -->
+- [x] "¿Olvidaste tu contraseña?" es visual pero no navega a ninguna página. <!-- PASS: es un <span> sin enlace <a>; al hacer click la URL no cambia -->
+- [x] `npm run lint` y `npx tsc --noEmit` pasan sin errores. <!-- PASS: npm run lint y npx tsc --noEmit ejecutados con código 0 y 0 errores -->
 
 ## Decisiones
 

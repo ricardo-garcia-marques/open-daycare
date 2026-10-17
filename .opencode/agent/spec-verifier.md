@@ -1,6 +1,6 @@
 ---
 description: Verifies acceptance criteria of a spec file (specs/*.md). Reviews code, runs lint/tsc, queries Context7 for current Next.js recommendations, and uses the Playwright MCP with vision to compare rendered screens against reference screenshots. Checks and fixes the spec checkboxes based on real results.
-mode: all
+mode: subagent
 model: github-copilot/gemini-3.8-flash
 permission:
   edit: allow
