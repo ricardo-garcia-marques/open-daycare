@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { Sidebar } from "./(components)/sidebar";
-import { FEED_POSTS, POST_TYPE_LABELS } from "@/lib/mock-feed";
+import {
+  FEED_POSTS,
+  POST_TYPE_BADGE_COLORS,
+  POST_TYPE_LABELS,
+} from "@/lib/mock-feed";
 
 function HeartIcon() {
   return (
@@ -90,14 +94,9 @@ function MegaphoneIcon() {
   );
 }
 
-const BADGE_STYLES = {
-  achievement: "bg-badge-achievement-bg text-badge-achievement",
-  activity: "bg-badge-activity-bg text-badge-activity",
-  announcement: "bg-badge-announcement-bg text-badge-announcement",
-} as const;
-
 function PostCard({ post }: { post: (typeof FEED_POSTS)[number] }) {
   const isAnnouncement = post.type === "announcement";
+  const badgeColors = POST_TYPE_BADGE_COLORS[post.type];
 
   return (
     <div className="bg-surface border border-border rounded-[20px] px-[22px] py-5 shadow-[0_4px_16px_-12px_rgba(120,90,60,0.5)]">
@@ -132,7 +131,11 @@ function PostCard({ post }: { post: (typeof FEED_POSTS)[number] }) {
           </div>
         </div>
         <div
-          className={`flex items-center gap-[7px] px-3 py-1.5 rounded-full text-[12px] font-extrabold tracking-[0.5px] ${BADGE_STYLES[post.type]}`}
+          className="flex items-center gap-[7px] px-3 py-1.5 rounded-full text-[12px] font-extrabold tracking-[0.5px]"
+          style={{
+            backgroundColor: badgeColors.bg,
+            color: badgeColors.text,
+          }}
         >
           <span className="w-2 h-2 rounded-full bg-current" />
           {POST_TYPE_LABELS[post.type]}
