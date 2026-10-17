@@ -1,7 +1,12 @@
+"use client";
+
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
+import { useState } from "react";
 import { Sidebar } from "../../(components)/sidebar";
-import { KIDS, type LinkedParent, type Kid } from "@/lib/mock-kids";
+import { AddKidModal, type AddKidModalMode } from "../../(components)/add-kid-modal";
+import { useKidsStore } from "@/lib/kids-store";
+import type { LinkedParent } from "@/lib/mock-kids";
 
 const PARENT_STATUS_LABELS: Record<LinkedParent["status"], string> = {
   active: "ACTIVA",
@@ -122,117 +127,24 @@ function ParentRow({ parent }: { parent: LinkedParent }) {
   );
 }
 
-function KidProfileContent({ kid }: { kid: Kid }) {
-  return (
-    <div className="max-w-[820px] w-full mx-auto px-10 pt-[34px] pb-20">
-      <Link
-        href="/kids"
-        className="flex items-center gap-[7px] text-muted font-bold text-[14px] mb-5"
-      >
-        <ChevronLeftIcon />
-        Volver a Niños
-      </Link>
+export default function KidProfilePage() {
+  const params = useParams<{ id: string }>();
+  const { hydrated, getKidById } = useKidsStore();
+  const [modalMode, setModalMode] = useState<AddKidModalMode | null>(null);
 
-      <div className="flex gap-[26px] flex-wrap items-start">
-        <div className="flex-1 min-w-[300px] flex flex-col gap-[18px]">
-          <div className="flex items-center gap-[18px]">
-            <div
-              className="w-[84px] h-[84px] rounded-full font-display font-semibold text-[34px] flex items-center justify-center flex-none"
-              style={{ background: kid.avatarBgColor, color: kid.avatarTextColor }}
-            >
-              {kid.initial}
-            </div>
-            <div className="flex-1">
-              <h1 className="font-display font-semibold text-[28px] m-0 text-heading">
-                {kid.name}
-              </h1>
-              <p className="mt-[3px] mb-0 text-muted text-[15px]">
-                {kid.ageInYears} años · Sala {kid.room}
-              </p>
-            </div>
-            <Link
-              href="/kids/agregar"
-              className="border-[1.5px] border-border bg-surface text-nav-inactive font-bold text-[14px] py-[9px] px-4 rounded-xl"
-            >
-              Editar
-            </Link>
-          </div>
+  const kid = getKidById(params.id);
 
-          {kid.allergyNote ? (
-            <div className="flex gap-[14px] bg-[#FBDAD6] rounded-2xl py-4 px-[18px]">
-              <div className="w-10 h-10 rounded-[11px] bg-[#F4A8A0] flex items-center justify-center flex-none">
-                <WarningIcon />
-              </div>
-              <div>
-                <div className="font-extrabold text-[#C5413A] text-[15px] mb-[2px]">
-                  Alergias y notas
-                </div>
-                <div className="text-[#B25249] text-[14.5px] leading-normal">
-                  {kid.allergyNote}
-                </div>
-              </div>
-            </div>
-          ) : null}
-
-          <div className="bg-surface border border-border rounded-2xl overflow-hidden">
-            <InfoRow label="Fecha de nacimiento" value={kid.birthDate} />
-            <InfoRow label="Sala" value={kid.room} />
-            <InfoRow label="Ingreso" value={kid.enrolledAt} />
-          </div>
-        </div>
-
-        <div className="w-[300px] flex-none flex flex-col gap-[14px]">
-          <Link
-            href="/day-summary"
-            className="flex items-center justify-center gap-[9px] w-full py-[13px] rounded-[14px] bg-heading text-white font-extrabold text-[15px]"
-          >
-            <SunIcon size={18} strokeWidth={2} />
-            Resumen del día
-          </Link>
-
-          <div className="bg-surface border border-border rounded-2xl p-4 px-[18px]">
-            <div className="text-[12.5px] font-extrabold tracking-[0.8px] text-label mb-[14px]">
-              PADRES VINCULADOS
-            </div>
-            <div className="flex flex-col gap-[14px]">
-              {kid.linkedParents.map((parent) => (
-                <ParentRow key={parent.name} parent={parent} />
-              ))}
-              <Link
-                href={`/kids/${kid.id}/vincular-padre`}
-                className="flex items-center gap-3 pt-2"
-              >
-                <span className="w-10 h-10 rounded-full border-[1.5px] border-dashed border-[#D8CBBA] flex items-center justify-center text-[#B0A290] flex-none">
-                  <PlusIcon />
-                </span>
-                <span className="font-extrabold text-[14.5px] text-primary-strong">
-                  Vincular otro padre
-                </span>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export const instant = false;
-
-export function generateStaticParams() {
-  return KIDS.map((kid) => ({ id: kid.id }));
-}
-
-export default async function KidProfilePage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
-  const kid = KIDS.find((candidate) => candidate.id === id);
+  if (hydrated && !kid) {
+    notFound();
+  }
 
   if (!kid) {
-    notFound();
+    return (
+      <div className="flex min-h-screen bg-page-bg">
+        <Sidebar />
+        <main className="flex-1 min-w-0 h-screen overflow-y-auto" />
+      </div>
+    );
   }
 
   return (
@@ -240,8 +152,100 @@ export default async function KidProfilePage({
       <Sidebar />
 
       <main className="flex-1 min-w-0 h-screen overflow-y-auto">
-        <KidProfileContent kid={kid} />
+        <div className="max-w-[820px] w-full mx-auto px-10 pt-[34px] pb-20">
+          <Link
+            href="/kids"
+            className="flex items-center gap-[7px] text-muted font-bold text-[14px] mb-5"
+          >
+            <ChevronLeftIcon />
+            Volver a Niños
+          </Link>
+
+          <div className="flex gap-[26px] flex-wrap items-start">
+            <div className="flex-1 min-w-[300px] flex flex-col gap-[18px]">
+              <div className="flex items-center gap-[18px]">
+                <div
+                  className="w-[84px] h-[84px] rounded-full font-display font-semibold text-[34px] flex items-center justify-center flex-none"
+                  style={{ background: kid.avatarBgColor, color: kid.avatarTextColor }}
+                >
+                  {kid.initial}
+                </div>
+                <div className="flex-1">
+                  <h1 className="font-display font-semibold text-[28px] m-0 text-heading">
+                    {kid.name}
+                  </h1>
+                  <p className="mt-[3px] mb-0 text-muted text-[15px]">
+                    {kid.ageInYears} años · Sala {kid.room}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setModalMode({ kind: "edit", kid })}
+                  className="border-[1.5px] border-border bg-surface text-nav-inactive font-bold text-[14px] py-[9px] px-4 rounded-xl cursor-pointer"
+                >
+                  Editar
+                </button>
+              </div>
+
+              {kid.allergyNote ? (
+                <div className="flex gap-[14px] bg-[#FBDAD6] rounded-2xl py-4 px-[18px]">
+                  <div className="w-10 h-10 rounded-[11px] bg-[#F4A8A0] flex items-center justify-center flex-none">
+                    <WarningIcon />
+                  </div>
+                  <div>
+                    <div className="font-extrabold text-[#C5413A] text-[15px] mb-[2px]">
+                      Alergias y notas
+                    </div>
+                    <div className="text-[#B25249] text-[14.5px] leading-normal">
+                      {kid.allergyNote}
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+
+              <div className="bg-surface border border-border rounded-2xl overflow-hidden">
+                <InfoRow label="Fecha de nacimiento" value={kid.birthDate} />
+                <InfoRow label="Sala" value={kid.room} />
+                <InfoRow label="Ingreso" value={kid.enrolledAt} />
+              </div>
+            </div>
+
+            <div className="w-[300px] flex-none flex flex-col gap-[14px]">
+              <Link
+                href="/day-summary"
+                className="flex items-center justify-center gap-[9px] w-full py-[13px] rounded-[14px] bg-heading text-white font-extrabold text-[15px]"
+              >
+                <SunIcon size={18} strokeWidth={2} />
+                Resumen del día
+              </Link>
+
+              <div className="bg-surface border border-border rounded-2xl p-4 px-[18px]">
+                <div className="text-[12.5px] font-extrabold tracking-[0.8px] text-label mb-[14px]">
+                  PADRES VINCULADOS
+                </div>
+                <div className="flex flex-col gap-[14px]">
+                  {kid.linkedParents.map((parent) => (
+                    <ParentRow key={parent.name} parent={parent} />
+                  ))}
+                  <Link
+                    href={`/kids/${kid.id}/vincular-padre`}
+                    className="flex items-center gap-3 pt-2"
+                  >
+                    <span className="w-10 h-10 rounded-full border-[1.5px] border-dashed border-[#D8CBBA] flex items-center justify-center text-[#B0A290] flex-none">
+                      <PlusIcon />
+                    </span>
+                    <span className="font-extrabold text-[14.5px] text-primary-strong">
+                      Vincular otro padre
+                    </span>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </main>
+
+      {modalMode ? <AddKidModal mode={modalMode} onClose={() => setModalMode(null)} /> : null}
     </div>
   );
 }
