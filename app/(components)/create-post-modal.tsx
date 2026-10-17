@@ -18,8 +18,6 @@ const POST_TYPE_ORDER: PostType[] = [
   "announcement",
 ];
 
-const WHOLE_ROOM = "__all__";
-
 const MAX_PHOTOS = 4;
 
 export type CreatePostPayload = {
