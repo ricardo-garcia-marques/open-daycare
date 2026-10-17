@@ -153,8 +153,13 @@ function getStoreSnapshot(): { kids: Kid[]; hydrated: boolean } {
   return storeSnapshot;
 }
 
+const SERVER_STORE_SNAPSHOT: { kids: Kid[]; hydrated: boolean } = {
+  kids: KIDS,
+  hydrated: false,
+};
+
 function getServerStoreSnapshot(): { kids: Kid[]; hydrated: boolean } {
-  return { kids: KIDS, hydrated: false };
+  return SERVER_STORE_SNAPSHOT;
 }
 
 function hydrateStore() {
