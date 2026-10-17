@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useCreatePost } from "./create-post-provider";
 
 function SunIcon() {
   return (
@@ -135,6 +136,7 @@ const NAV_ITEMS = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { openCreatePost } = useCreatePost();
   return (
     <aside className="w-[248px] flex-none bg-surface border-r border-border flex flex-col py-6 px-4 sticky top-0 h-screen">
       <Link href="/" className="flex items-center gap-[11px] px-2 pt-1 pb-[22px]">
@@ -149,13 +151,14 @@ export function Sidebar() {
         </div>
       </Link>
 
-      <Link
-        href="/crear-publicacion"
-        className="flex items-center justify-center gap-2 w-full py-3 rounded-[14px] bg-gradient-to-b from-compose-gradient-from to-compose-gradient-to text-white font-extrabold text-[14.5px] shadow-[0_8px_18px_-8px_rgba(238,129,100,0.75)] mb-[18px]"
+      <button
+        type="button"
+        onClick={openCreatePost}
+        className="flex items-center justify-center gap-2 w-full py-3 rounded-[14px] bg-gradient-to-b from-compose-gradient-from to-compose-gradient-to text-white font-extrabold text-[14.5px] shadow-[0_8px_18px_-8px_rgba(238,129,100,0.75)] mb-[18px] cursor-pointer"
       >
         <PlusIcon />
         Nueva publicación
-      </Link>
+      </button>
 
       <nav className="flex flex-col gap-1 flex-1">
         {NAV_ITEMS.map((item) => {
