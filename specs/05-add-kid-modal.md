@@ -1,6 +1,6 @@
 # SPEC 05 — Modal Agregar/Editar niño
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 02, SPEC 03
 > **Fecha:** 2026-10-17
 > **Objetivo:** Modal superpuesto "Agregar niño" (mockup `references/pantallas/agregar-nino.dc.html`) lanzado desde los botones de agregar niño de las pantallas implementadas, con máscara que exija una fecha de nacimiento válida y alta persistente en localStorage.
@@ -60,18 +60,18 @@ Estado local efímero del formulario (client component, no persiste):
 
 ## Criterios de aceptación
 
-- [ ] El botón "Agregar niño" de `/kids` y el de `/kids/[id]` abren el modal; ya no navegan a `/kids/agregar` y esa ruta devuelve 404.
-- [ ] El modal coincide con el mockup (card `#FBF4EC` radio 24px, cabecera Cancelar/Agregar niño/Guardar con los colores del mockup, 4 campos con sus estilos).
-- [ ] La fecha auto-inserta `/` y acepta solo dígitos mientras se escribe.
-- [ ] `31/02/2023`, `05/13/2025` y una fecha futura muestran mensaje de error visible y **Guardar queda deshabilitado** (no cierra ni guarda).
-- [ ] Con fecha completa, real y pasada, Guardar se habilita y guarda normalmente.
-- [ ] SALA es un select nativo con Soles/Estrellas/Luna y arranca en "Soles".
-- [ ] Guardar cierra el modal, el niño aparece al principio de `/kids` y sigue ahí tras recargar (localStorage `opendaycare:kids:v1`).
-- [ ] Escribir "Maní, Lactosa" en ALERGIAS produce `allergies: ["Maní", "Lactosa"]`, visible en el perfil del niño.
-- [ ] El nuevo niño tiene id-slug, initial y avatar derivados, `enrolledAt` del mes actual y 0 padres vinculados; su `/kids/[id]` funciona.
-- [ ] "Editar" en `/kids/[id]` abre el modal precargado con título "Editar niño"; Guardar actualiza y persiste tras recargar.
-- [ ] Cancelar, Escape y click en backdrop cierran el modal sin guardar y sin confirmación.
-- [ ] `npm run lint` y `npx tsc --noEmit` pasan sin errores.
+- [x] El botón "Agregar niño" de `/kids` y el de `/kids/[id]` abren el modal; ya no navegan a `/kids/agregar` y esa ruta devuelve 404.
+- [x] El modal coincide con el mockup (card `#FBF4EC` radio 24px, cabecera Cancelar/Agregar niño/Guardar con los colores del mockup, 4 campos con sus estilos).
+- [x] La fecha auto-inserta `/` y acepta solo dígitos mientras se escribe.
+- [x] `31/02/2023`, `05/13/2025` y una fecha futura muestran mensaje de error visible y **Guardar queda deshabilitado** (no cierra ni guarda).
+- [x] Con fecha completa, real y pasada, Guardar se habilita y guarda normalmente.
+- [x] SALA es un select nativo con Soles/Estrellas/Luna y arranca en "Soles".
+- [x] Guardar cierra el modal, el niño aparece al principio de `/kids` y sigue ahí tras recargar (localStorage `opendaycare:kids:v1`).
+- [x] Escribir "Maní, Lactosa" en ALERGIAS produce `allergies: ["Maní", "Lactosa"]`, visible en el perfil del niño.
+- [x] El nuevo niño tiene id-slug, initial y avatar derivados, `enrolledAt` del mes actual y 0 padres vinculados; su `/kids/[id]` funciona.
+- [x] "Editar" en `/kids/[id]` abre el modal precargado con título "Editar niño"; Guardar actualiza y persiste tras recargar.
+- [x] Cancelar, Escape y click en backdrop cierran el modal sin guardar y sin confirmación.
+- [x] `npm run lint` y `npx tsc --noEmit` pasan sin errores.
 
 ## Decisiones
 
