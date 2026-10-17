@@ -34,6 +34,12 @@
   --chip-allergy: #d9684a;
   --chip-link-bg: #f9d2de;
   --chip-link: #c56486;
+  --auth-bg: #fbf4ec;
+  --input-border: #eadfd0;
+  --placeholder: #b6a99b;
+  --consent-bg: #fbf1d6;
+  --consent-text: #8a7234;
+  --consent-check: #5fb97e;
   --scrollbar: #e4d6c4;
 }
 
@@ -71,6 +77,12 @@
   --color-chip-allergy: var(--chip-allergy);
   --color-chip-link-bg: var(--chip-link-bg);
   --color-chip-link: var(--chip-link);
+  --color-auth-bg: var(--auth-bg);
+  --color-input-border: var(--input-border);
+  --color-placeholder: var(--placeholder);
+  --color-consent-bg: var(--consent-bg);
+  --color-consent-text: var(--consent-text);
+  --color-consent-check: var(--consent-check);
   --font-sans: var(--font-nunito), system-ui, sans-serif;
   --font-display: var(--font-fredoka), var(--font-nunito), system-ui, sans-serif;
 }
