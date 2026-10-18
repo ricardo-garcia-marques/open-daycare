@@ -48,6 +48,12 @@ export const updateSession = async (request: NextRequest) => {
 
   const { pathname } = request.nextUrl
 
+  // API routes handle their own auth (e.g. activation with the service role);
+  // the proxy must not redirect them.
+  if (pathname.startsWith("/api")) {
+    return supabaseResponse
+  }
+
   // Route protection (SPEC 08): everything except the auth screens requires a
   // session. Authentication only — role-based authorization stays server-side.
   if (!user && pathname !== "/login" && pathname !== "/activate-account") {
