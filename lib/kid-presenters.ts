@@ -1,6 +1,4 @@
-import type { Kid } from "@/lib/mock-kids";
-
-const AVATAR_PALETTE: Array<Pick<Kid, "avatarBgColor" | "avatarTextColor">> = [
+const AVATAR_PALETTE = [
   { avatarBgColor: "#F4B8CC", avatarTextColor: "#C44A7A" },
   { avatarBgColor: "#F4DC8E", avatarTextColor: "#9A7B1E" },
   { avatarBgColor: "#C9B6E8", avatarTextColor: "#6B4FA0" },

@@ -21,6 +21,7 @@ export type KidListItem = {
 };
 
 export type KidDetail = KidListItem & {
+  roomId: string | null;
   birthDate: string;
   enrolledAt: string;
   room: string;
@@ -86,6 +87,7 @@ export async function getKidById(id: string): Promise<KidDetail | null> {
   const row = data as unknown as ChildRow;
   return {
     ...toListItem(row),
+    roomId: row.room_id,
     birthDate: row.birth_date,
     enrolledAt: row.enrolled_at,
     room: row.rooms?.name ?? "Sin sala",

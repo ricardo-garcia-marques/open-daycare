@@ -1,23 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { useState } from "react";
 import { Sidebar } from "./sidebar";
 import { AddKidModal, type AddKidModalMode } from "./add-kid-modal";
-import { LinkParentModal } from "./link-parent-modal";
-import { useKidsStore } from "@/lib/kids-store";
-import type { LinkedParent } from "@/lib/mock-kids";
-
-const PARENT_STATUS_LABELS: Record<LinkedParent["status"], string> = {
-  active: "ACTIVA",
-  pending: "PENDIENTE",
-};
-
-const PARENT_STATUS_SUBTITLES: Record<LinkedParent["status"], string> = {
-  active: "activa",
-  pending: "invitación enviada",
-};
+import { formatIsoDate, formatIsoMonth } from "@/lib/kid-presenters";
+import type { KidDetail } from "@/lib/kids-db";
 
 function ChevronLeftIcon() {
   return (
@@ -98,55 +86,8 @@ function InfoRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-function ParentRow({ parent }: { parent: LinkedParent }) {
-  return (
-    <div className="flex items-center gap-3">
-      <div
-        className="w-10 h-10 rounded-full text-white font-display font-semibold text-[16px] flex items-center justify-center flex-none"
-        style={{ background: parent.avatarBgColor }}
-      >
-        {parent.initial}
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="font-extrabold text-[14.5px] text-heading">
-          {parent.name}
-        </div>
-        <div className="text-[12.5px] text-muted-light">
-          {parent.role} · {PARENT_STATUS_SUBTITLES[parent.status]}
-        </div>
-      </div>
-      <span
-        className={`flex-none text-[10.5px] font-extrabold py-1 px-[9px] rounded-full ${
-          parent.status === "active"
-            ? "bg-badge-achievement-bg text-badge-achievement"
-            : "bg-[#F7E7A6] text-[#9A7B1E]"
-        }`}
-      >
-        {PARENT_STATUS_LABELS[parent.status]}
-      </span>
-    </div>
-  );
-}
-
-export function KidProfile({ kidId }: { kidId: string }) {
-  const { hydrated, getKidById, addLinkedParent } = useKidsStore();
+export function KidProfile({ kid }: { kid: KidDetail }) {
   const [modalMode, setModalMode] = useState<AddKidModalMode | null>(null);
-  const [linkParentOpen, setLinkParentOpen] = useState(false);
-
-  const kid = getKidById(kidId);
-
-  if (hydrated && !kid) {
-    notFound();
-  }
-
-  if (!kid) {
-    return (
-      <div className="flex min-h-screen bg-page-bg">
-        <Sidebar />
-        <main className="flex-1 min-w-0 h-screen overflow-y-auto" />
-      </div>
-    );
-  }
 
   return (
     <div className="flex min-h-screen bg-page-bg">
@@ -205,9 +146,9 @@ export function KidProfile({ kidId }: { kidId: string }) {
               ) : null}
 
               <div className="bg-surface border border-border rounded-2xl overflow-hidden">
-                <InfoRow label="Fecha de nacimiento" value={kid.birthDate} />
+                <InfoRow label="Fecha de nacimiento" value={formatIsoDate(kid.birthDate)} />
                 <InfoRow label="Sala" value={kid.room} />
-                <InfoRow label="Ingreso" value={kid.enrolledAt} />
+                <InfoRow label="Ingreso" value={formatIsoMonth(kid.enrolledAt)} />
               </div>
             </div>
 
@@ -225,12 +166,11 @@ export function KidProfile({ kidId }: { kidId: string }) {
                   PADRES VINCULADOS
                 </div>
                 <div className="flex flex-col gap-[14px]">
-                  {kid.linkedParents.map((parent) => (
-                    <ParentRow key={parent.name} parent={parent} />
-                  ))}
+                  <p className="m-0 text-[13.5px] text-muted-light leading-normal">
+                    Este niño aún no tiene padres vinculados.
+                  </p>
                   <button
                     type="button"
-                    onClick={() => setLinkParentOpen(true)}
                     className="flex items-center gap-3 pt-2 cursor-pointer"
                   >
                     <span className="w-10 h-10 rounded-full border-[1.5px] border-dashed border-[#D8CBBA] flex items-center justify-center text-[#B0A290] flex-none">
@@ -248,17 +188,6 @@ export function KidProfile({ kidId }: { kidId: string }) {
       </main>
 
       {modalMode ? <AddKidModal mode={modalMode} onClose={() => setModalMode(null)} /> : null}
-
-      {linkParentOpen ? (
-        <LinkParentModal
-          kid={kid}
-          onClose={() => setLinkParentOpen(false)}
-          onSubmit={(parent) => {
-            addLinkedParent(kid.id, parent);
-            setLinkParentOpen(false);
-          }}
-        />
-      ) : null}
     </div>
   );
 }
