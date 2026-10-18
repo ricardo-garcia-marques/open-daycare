@@ -10,6 +10,7 @@ import {
 } from "react";
 import { useKidsStore } from "@/lib/kids-store";
 import { usePostsStore } from "@/lib/posts-store";
+import { useCurrentUser } from "@/lib/user-store";
 import { CreatePostModal, type CreatePostPayload } from "./create-post-modal";
 
 type CreatePostContextValue = {
@@ -45,6 +46,7 @@ function buildAddressedTo(
 export function CreatePostProvider({ children }: { children: ReactNode }) {
   const { kids } = useKidsStore();
   const { addPost } = usePostsStore();
+  const user = useCurrentUser();
   const [open, setOpen] = useState(false);
 
   const openCreatePost = useCallback(() => setOpen(true), []);
@@ -53,11 +55,14 @@ export function CreatePostProvider({ children }: { children: ReactNode }) {
   const handleSubmit = useCallback(
     (payload: CreatePostPayload) => {
       const kidsById = new Map(kids.map((kid) => [kid.id, kid.name]));
+      const authorName = user.status === "ready" ? user.fullName : "Anónimo";
+      const authorInitial =
+        user.status === "ready" ? user.initial : authorName.charAt(0).toUpperCase();
       addPost({
-        authorInitial: "C",
+        authorInitial,
         avatarBgColor: "#F2937A",
         avatarTextColor: "#FFFFFF",
-        authorName: "Caro Giménez",
+        authorName,
         time: formatClock(),
         type: payload.type,
         addressedTo: buildAddressedTo(kidsById, payload),
@@ -69,7 +74,7 @@ export function CreatePostProvider({ children }: { children: ReactNode }) {
       });
       setOpen(false);
     },
-    [kids, addPost]
+    [kids, addPost, user]
   );
 
   const value = useMemo(() => ({ openCreatePost }), [openCreatePost]);
