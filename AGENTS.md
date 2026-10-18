@@ -53,6 +53,10 @@ Este proyecto usa Supabase como backend (base de datos Postgres, Auth, Storage, 
 - Variables de entorno: `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (en `.env`, ver `.env.template`).
 - Al añadir nuevas páginas/rutas que lean datos, usar el cliente de servidor; para llamadas desde el navegador, usar el cliente de browser.
 
+## Agentes
+
+- **Agente `db-migrator`** (subagent): gestiona el ciclo de vida de las migraciones de Supabase — crea migraciones a partir de specs (`specs/database/*.md`) o instrucciones, verifica que disco y remoto estén sincronizados (`supabase_list_migrations` vs `supabase/migrations/`), y las aplica al remoto con `npx supabase db push`. Detecta drift y pide confirmación antes de `migration repair`. Invocarlo con el task tool (`subagent_type: "db-migrator"`) para cualquier tarea de crear/verificar/aplicar migraciones de DB.
+
 ## Skills
 
 - /spec Usaremos esta habilidad para crear las especificaciones.
