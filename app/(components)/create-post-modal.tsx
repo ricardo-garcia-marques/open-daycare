@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useKidsStore } from "@/lib/kids-store";
+import { useKidOptions } from "@/lib/use-kid-options";
 import {
   POST_TYPE_BADGE_COLORS,
   POST_TYPE_LABELS,
@@ -71,7 +71,7 @@ export function CreatePostModal({
   onClose: () => void;
   onSubmit: (payload: CreatePostPayload) => void;
 }) {
-  const { kids } = useKidsStore();
+  const kids = useKidOptions();
   const [selectedKidIds, setSelectedKidIds] = useState<string[]>([]);
   const [wholeRoom, setWholeRoom] = useState(false);
   const [type, setType] = useState<PostType | null>(null);
@@ -172,7 +172,7 @@ export function CreatePostModal({
             Cancelar
           </button>
           <span className="flex-1 px-3 text-center font-display text-[18px] font-semibold text-[#3F362E]">
-            Nueva publicación
+            Nueva publicaciÃ³n
           </span>
           <button
             type="button"
@@ -267,12 +267,12 @@ export function CreatePostModal({
           </div>
 
           <div className="mb-[10px] text-[12px] font-extrabold tracking-[0.7px] text-[#94887B]">
-            DESCRIPCIÓN
+            DESCRIPCIÃ“N
           </div>
           <textarea
             value={description}
             onChange={(event) => setDescription(event.target.value)}
-            placeholder="Contá cómo le fue hoy…"
+            placeholder="ContÃ¡ cÃ³mo le fue hoyâ€¦"
             className="mb-[22px] min-h-[120px] w-full resize-y rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[14px] text-[15px] leading-[1.5] text-[#3F362E] placeholder:text-[#B6A99B] focus:outline-none"
           />
 

@@ -49,11 +49,13 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let cancelled = false;
+    let loadGeneration = 0;
 
     async function loadCurrentUser() {
+      const generation = ++loadGeneration;
       const supabase = createClient();
       const { data, error } = await supabase.auth.getUser();
-      if (cancelled) {
+      if (cancelled || generation !== loadGeneration) {
         return;
       }
       if (error || !data.user) {
@@ -65,7 +67,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         .select("full_name, role")
         .eq("id", data.user.id)
         .single();
-      if (cancelled) {
+      if (cancelled || generation !== loadGeneration) {
         return;
       }
       if (profileError || !profile) {
@@ -82,10 +84,30 @@ export function UserProvider({ children }: { children: ReactNode }) {
       });
     }
 
+    // Re-run on every auth change (login, logout, user switch within the
+    // same client session): the root layout keeps this provider mounted
+    // across client-side navigations, so a mount-only fetch goes stale.
+    // The callback must stay sync and free of auth calls besides the
+    // deferred load — supabase-js fires it synchronously inside
+    // signInWithPassword/signOut, and re-entering the client there can
+    // deadlock the login promise, hanging the form on "Iniciando sesión…".
+    const {
+      data: { subscription },
+    } = createClient().auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
+        setUser({ status: "loading" });
+        queueMicrotask(() => {
+          if (!cancelled) {
+            loadCurrentUser();
+          }
+        });
+      }
+    });
     loadCurrentUser();
 
     return () => {
       cancelled = true;
+      subscription.unsubscribe();
     };
   }, []);
 

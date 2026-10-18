@@ -8,7 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { useKidsStore } from "@/lib/kids-store";
+import { useKidOptions } from "@/lib/use-kid-options";
 import { usePostsStore } from "@/lib/posts-store";
 import { useCurrentUser } from "@/lib/user-store";
 import { CreatePostModal, type CreatePostPayload } from "./create-post-modal";
@@ -44,7 +44,7 @@ function buildAddressedTo(
 }
 
 export function CreatePostProvider({ children }: { children: ReactNode }) {
-  const { kids } = useKidsStore();
+  const kids = useKidOptions();
   const { addPost } = usePostsStore();
   const user = useCurrentUser();
   const [open, setOpen] = useState(false);

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Fredoka, Nunito } from "next/font/google";
-import { KidsStoreProvider } from "@/lib/kids-store";
 import { PostsStoreProvider } from "@/lib/posts-store";
 import { UserProvider } from "@/lib/user-store";
 import { CreatePostProvider } from "./(components)/create-post-provider";
@@ -31,13 +30,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${fredoka.variable} ${nunito.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <KidsStoreProvider>
-          <PostsStoreProvider>
-            <UserProvider>
-              <CreatePostProvider>{children}</CreatePostProvider>
-            </UserProvider>
-          </PostsStoreProvider>
-        </KidsStoreProvider>
+        <PostsStoreProvider>
+          <UserProvider>
+            <CreatePostProvider>{children}</CreatePostProvider>
+          </UserProvider>
+        </PostsStoreProvider>
       </body>
     </html>
   );

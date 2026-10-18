@@ -1,11 +1,8 @@
+import { notFound } from "next/navigation";
 import { KidProfile } from "../../(components)/kid-profile";
-import { KIDS } from "@/lib/mock-kids";
+import { getKidById } from "@/lib/kids-db";
 
 export const instant = false;
-
-export function generateStaticParams() {
-  return KIDS.map((kid) => ({ id: kid.id }));
-}
 
 export default async function KidProfilePage({
   params,
@@ -14,5 +11,17 @@ export default async function KidProfilePage({
 }) {
   const { id } = await params;
 
-  return <KidProfile kidId={id} />;
+  let kid = null;
+  try {
+    kid = await getKidById(id);
+  } catch {
+    // Invalid uuid syntax or query failure: the child does not resolve.
+    kid = null;
+  }
+
+  if (!kid) {
+    notFound();
+  }
+
+  return <KidProfile kid={kid} />;
 }

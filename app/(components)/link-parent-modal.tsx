@@ -1,12 +1,11 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
-import type { Kid } from "@/lib/mock-kids";
-import { useKidsStore } from "@/lib/kids-store";
+import type { KidDetail } from "@/lib/kids-db";
 
 const INVITATION_CODE = "7K4P9";
 
-const RELATIONSHIP_OPTIONS = ["Mamá", "Papá", "Tutor/a"] as const;
+const RELATIONSHIP_OPTIONS = ["MamÃ¡", "PapÃ¡", "Tutor/a"] as const;
 
 const FIELD_LABEL_CLASS =
   "text-[12px] font-extrabold tracking-[0.7px] text-[#94887B] mb-2";
@@ -69,20 +68,15 @@ function SendIcon() {
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-function normalizeParentName(name: string): string {
-  return name.trim().toLowerCase();
-}
-
 export function LinkParentModal({
   kid,
   onClose,
   onSubmit,
 }: {
-  kid: Kid;
+  kid: KidDetail;
   onClose: () => void;
   onSubmit: (parent: { name: string; role: string }) => void;
 }) {
-  const { kids } = useKidsStore();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [relationship, setRelationship] = useState<
@@ -96,21 +90,16 @@ export function LinkParentModal({
     }
     return EMAIL_PATTERN.test(email.trim())
       ? null
-      : "Ingresá un email válido (ej. nombre@correo.com).";
+      : "IngresÃ¡ un email vÃ¡lido (ej. nombre@correo.com).";
   }, [email]);
   const duplicateError = useMemo(() => {
     if (!trimmedName) {
       return null;
     }
-    const currentKid = kids.find((candidate) => candidate.id === kid.id);
-    const isDuplicate = (currentKid?.linkedParents ?? []).some(
-      (parent) =>
-        normalizeParentName(parent.name) === normalizeParentName(trimmedName)
-    );
-    return isDuplicate
-      ? "Esa persona ya está vinculada a este niño."
-      : null;
-  }, [kids, kid.id, trimmedName]);
+    // Kids are orphan by default: parent linking lands on a future spec, so
+    // the panel is always empty and there is no existing parent to duplicate.
+    return null;
+  }, [trimmedName]);
 
   const canSubmit =
     trimmedName.length > 0 &&
@@ -164,8 +153,8 @@ export function LinkParentModal({
           <div className="flex gap-[11px] bg-[#E3ECFB] rounded-[14px] py-[13px] px-4 mb-5">
             <InfoIcon />
             <span className="text-[13.5px] text-[#3F5694] leading-[1.45]">
-              Le enviaremos un correo con un código para que active su cuenta.
-              Solo verá el feed de {kid.name.split(" ")[0]}.
+              Le enviaremos un correo con un cÃ³digo para que active su cuenta.
+              Solo verÃ¡ el feed de {kid.name.split(" ")[0]}.
             </span>
           </div>
 
@@ -173,7 +162,7 @@ export function LinkParentModal({
           <input
             value={name}
             onChange={(event) => setName(event.target.value)}
-            placeholder="Ej. Diego Fernández"
+            placeholder="Ej. Diego FernÃ¡ndez"
             className={`${FIELD_INPUT_CLASS} ${
               duplicateError ? "border-[#D9583C]" : "border-[#EADFD0]"
             } mb-[18px]`}
@@ -223,13 +212,13 @@ export function LinkParentModal({
 
           <div className="bg-[#FBF1D6] border-[1.5px] border-dashed border-[#E6D08A] rounded-[16px] py-[18px] text-center mb-5">
             <div className="text-[12px] font-extrabold tracking-[0.7px] text-[#A88526] mb-2">
-              CÓDIGO DE INVITACIÓN
+              CÃ“DIGO DE INVITACIÃ“N
             </div>
             <div className="font-display font-semibold text-[34px] tracking-[7px] text-[#8A7234]">
               {INVITATION_CODE}
             </div>
             <div className="text-[13px] text-[#A88526] mt-[6px]">
-              Vence en 7 días
+              Vence en 7 dÃ­as
             </div>
           </div>
 
@@ -249,7 +238,7 @@ export function LinkParentModal({
             }`}
           >
             <SendIcon />
-            Enviar invitación
+            Enviar invitaciÃ³n
           </button>
         </div>
       </div>

@@ -1,14 +1,16 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { Kid } from "@/lib/mock-kids";
+import { createClient } from "@/utils/supabase/client";
+import { useRouter } from "next/navigation";
 import {
-  useKidsStore,
+  isoDateToMasked,
+  maskedDateToIso,
+  parseAllergyTags,
   validateBirthDate,
   type KidFormData,
-} from "@/lib/kids-store";
-
-const ROOM_OPTIONS = ["Soles", "Estrellas", "Luna"];
+} from "@/lib/kid-presenters";
+import type { KidDetail, Room } from "@/lib/kids-db";
 
 const FIELD_LABEL_CLASS =
   "text-[12px] font-extrabold tracking-[0.7px] text-[#94887B] mb-2";
@@ -17,7 +19,7 @@ const FIELD_INPUT_CLASS =
 
 export type AddKidModalMode =
   | { kind: "create" }
-  | { kind: "edit"; kid: Kid };
+  | { kind: "edit"; kid: KidDetail };
 
 function ChevronDownIcon() {
   return (
@@ -80,30 +82,17 @@ export function maskBirthDateInput(
   return masked;
 }
 
-function buildInitialFormData(kid?: Kid): KidFormData {
+function buildInitialFormData(kid?: KidDetail): KidFormData {
   if (kid) {
-    const monthLetterMatch = /^(\d+) ([a-zñ]+) (\d{4})$/.exec(kid.birthDate);
-    const monthIndex = monthLetterMatch
-      ? [
-          "ene", "feb", "mar", "abr", "may", "jun",
-          "jul", "ago", "sep", "oct", "nov", "dic",
-        ].indexOf(monthLetterMatch[2])
-      : -1;
-    const masked =
-      monthIndex >= 0
-        ? `${monthLetterMatch![1].padStart(2, "0")}/${String(
-            monthIndex + 1
-          ).padStart(2, "0")}/${monthLetterMatch![3]}`
-        : "";
     return {
       fullName: kid.name,
-      birthDate: masked,
-      room: kid.room,
+      birthDate: isoDateToMasked(kid.birthDate),
+      roomId: kid.roomId ?? "",
       allergiesRaw: kid.allergies.join(", "),
       medicalNotes: kid.allergyNote,
     };
   }
-  return { fullName: "", birthDate: "", room: "Soles", allergiesRaw: "", medicalNotes: "" };
+  return { fullName: "", birthDate: "", roomId: "", allergiesRaw: "", medicalNotes: "" };
 }
 
 export function AddKidModal({
@@ -113,15 +102,30 @@ export function AddKidModal({
   mode: AddKidModalMode;
   onClose: () => void;
 }) {
-  const { saveKid } = useKidsStore();
+  const router = useRouter();
   const [formData, setFormData] = useState<KidFormData>(() =>
     buildInitialFormData(mode.kind === "edit" ? mode.kid : undefined)
   );
+  const [rooms, setRooms] = useState<Room[] | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+    (async () => {
+      const { data } = await supabase.from("rooms").select("id, name");
+      setRooms((data as Room[]) ?? []);
+    })();
+  }, []);
 
   const birthDateError = useMemo(() => validateBirthDate(formData.birthDate), [
     formData.birthDate,
   ]);
-  const canSave = formData.fullName.trim().length > 0 && !birthDateError;
+  const canSave =
+    formData.fullName.trim().length > 0 &&
+    formData.roomId !== "" &&
+    !birthDateError &&
+    !saving;
 
   const handleBirthDateChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -147,8 +151,30 @@ export function AddKidModal({
     if (!canSave) {
       return;
     }
-    saveKid(formData, mode.kind === "edit" ? mode.kid.id : undefined);
-    onClose();
+    setSaving(true);
+    setSaveError(null);
+    const supabase = createClient();
+    const payload = {
+      full_name: formData.fullName.trim(),
+      birth_date: maskedDateToIso(formData.birthDate),
+      room_id: formData.roomId,
+      allergy_tags: parseAllergyTags(formData.allergiesRaw),
+      medical_notes: formData.medicalNotes.trim(),
+    };
+    const request =
+      mode.kind === "edit"
+        ? supabase.from("children").update(payload).eq("id", mode.kid.id)
+        : supabase.from("children").insert(payload);
+    (async () => {
+      const { error } = await request;
+      if (error) {
+        setSaveError("No se pudo guardar el niño. Intentalo de nuevo.");
+        setSaving(false);
+        return;
+      }
+      onClose();
+      router.refresh();
+    })();
   }
 
   return (
@@ -227,18 +253,23 @@ export function AddKidModal({
               <div className={FIELD_LABEL_CLASS}>SALA</div>
               <div className="relative">
                 <select
-                  value={formData.room}
+                  value={formData.roomId}
                   onChange={(event) =>
                     setFormData((current) => ({
                       ...current,
-                      room: event.target.value,
+                      roomId: event.target.value,
                     }))
                   }
                   className={`${FIELD_INPUT_CLASS} border-[#EADFD0] font-bold appearance-none pr-10 cursor-pointer`}
                 >
-                  {ROOM_OPTIONS.map((room) => (
-                    <option key={room} value={room}>
-                      {room}
+                  {mode.kind === "create" && formData.roomId === "" ? (
+                    <option value="" disabled>
+                      Seleccioná una sala
+                    </option>
+                  ) : null}
+                  {(rooms ?? []).map((room) => (
+                    <option key={room.id} value={room.id}>
+                      {room.name}
                     </option>
                   ))}
                 </select>
@@ -274,6 +305,12 @@ export function AddKidModal({
             placeholder="Indicaciones, medicación, contactos…"
             className={`${FIELD_INPUT_CLASS} border-[#EADFD0] min-h-[90px] resize-y leading-normal placeholder:text-[#B6A99B]`}
           />
+
+          {saveError ? (
+            <p className="mt-[12px] mb-0 text-[12.5px] font-bold text-[#C5413A]">
+              {saveError}
+            </p>
+          ) : null}
         </div>
       </div>
     </div>
