@@ -14,8 +14,6 @@ const ERROR_MESSAGES = {
   invitationUsed: "código inválido o vencido",
 } as const;
 
-type ErrorCode = keyof typeof ERROR_MESSAGES;
-
 function errorResponse(message: string, status = 400) {
   return NextResponse.json({ error: message }, { status });
 }
