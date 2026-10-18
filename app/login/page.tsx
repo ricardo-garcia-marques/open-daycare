@@ -22,7 +22,7 @@ const HeroPanel = (
     className="relative overflow-hidden flex flex-col justify-between text-white px-[60px] py-[56px]"
     style={{
       background:
-        "linear-gradient(155deg, #f6a98e 0%, #f2937a 45%, #ec7e62 100%)",
+        "linear-gradient(155deg, #ab5238 0%, #a85238 45%, #9c4a30 100%)",
     }}
   >
     <div className="absolute w-[420px] h-[420px] rounded-full bg-white/10 top-[-140px] right-[-120px]" />
@@ -57,12 +57,12 @@ const HeroPanel = (
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen grid grid-cols-[1.05fr_1fr] bg-auth-bg">
+    <main className="min-h-screen grid grid-cols-[1.05fr_1fr] bg-auth-bg">
       {HeroPanel}
       <div className="flex items-center justify-center px-10 py-10">
         <LoginForm />
       </div>
-    </div>
+    </main>
   );
 }
 

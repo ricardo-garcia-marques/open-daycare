@@ -9,6 +9,7 @@
   --divider: #e7dac8;
   --primary: #d9583c;
   --primary-strong: #c5503a;
+  --primary-strong-darker: #8c3d27;
   --accent: #f2937a;
   --compose-gradient-from: #f4977e;
   --compose-gradient-to: #ee8164;
@@ -36,6 +37,7 @@
   --chip-link: #c56486;
   --auth-bg: #fbf4ec;
   --input-border: #eadfd0;
+  --input-border-strong: #8a7a6d;
   --placeholder: #b6a99b;
   --consent-bg: #fbf1d6;
   --consent-text: #8a7234;
@@ -52,6 +54,7 @@
   --color-divider: var(--divider);
   --color-primary: var(--primary);
   --color-primary-strong: var(--primary-strong);
+  --color-primary-strong-darker: var(--primary-strong-darker);
   --color-accent: var(--accent);
   --color-compose-gradient-from: var(--compose-gradient-from);
   --color-compose-gradient-to: var(--compose-gradient-to);
@@ -79,6 +82,7 @@
   --color-chip-link: var(--chip-link);
   --color-auth-bg: var(--auth-bg);
   --color-input-border: var(--input-border);
+  --color-input-border-strong: var(--input-border-strong);
   --color-placeholder: var(--placeholder);
   --color-consent-bg: var(--consent-bg);
   --color-consent-text: var(--consent-text);
@@ -104,3 +108,4 @@ body {
   border: 3px solid transparent;
   background-clip: content-box;
 }
+

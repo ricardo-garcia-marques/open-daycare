@@ -6,6 +6,8 @@ import { useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 
 const GENERIC_ERROR = "Credenciales inválidas";
+const FOCUS_RING =
+  "focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c5503a] focus-visible:ring-offset-2 focus-visible:ring-offset-white";
 
 export function LoginForm() {
   const router = useRouter();
@@ -42,43 +44,58 @@ export function LoginForm() {
       <h2 className="font-display font-semibold text-[30px] text-heading m-0 mb-[6px]">
         Iniciar sesión
       </h2>
-      <p className="m-0 mb-[28px] text-muted text-[15px]">
+      <p className="m-0 mb-[28px] text-[#756a5d] text-[15px]">
         Ingresá para ver el día de hoy.
       </p>
 
-      <div className="text-[12px] font-bold tracking-[0.7px] text-muted mb-[8px]">
+      <label
+        htmlFor="login-email"
+        className="block text-[12px] font-bold tracking-[0.7px] text-heading mb-[8px]"
+      >
         EMAIL
-      </div>
+      </label>
       <input
+        id="login-email"
         type="email"
+        autoComplete="email"
         value={email}
         onChange={(event) => setEmail(event.target.value)}
-        className="w-full px-[16px] py-[14px] rounded-[14px] border-[1.5px] border-input-border bg-white text-[15px] text-heading mb-[18px] focus:outline-none placeholder:text-placeholder disabled:opacity-60"
+        className={`w-full px-[16px] py-[14px] rounded-[14px] border-[1.5px] border-input-border-strong bg-white text-[15px] text-heading mb-[18px] placeholder:text-[#756a5d] disabled:opacity-60 ${FOCUS_RING}`}
         disabled={submitting}
       />
 
-      <div className="text-[12px] font-bold tracking-[0.7px] text-muted mb-[8px]">
+      <label
+        htmlFor="login-password"
+        className="block text-[12px] font-bold tracking-[0.7px] text-heading mb-[8px]"
+      >
         CONTRASEÑA
-      </div>
+      </label>
       <input
+        id="login-password"
         type="password"
+        autoComplete="current-password"
         placeholder="••••••••"
         value={password}
         onChange={(event) => setPassword(event.target.value)}
-        className="w-full px-[16px] py-[14px] rounded-[14px] border-[1.5px] border-input-border bg-white text-[15px] text-heading mb-[10px] focus:outline-none placeholder:text-placeholder disabled:opacity-60"
+        className={`w-full px-[16px] py-[14px] rounded-[14px] border-[1.5px] border-input-border-strong bg-white text-[15px] text-heading mb-[10px] placeholder:text-[#756a5d] disabled:opacity-60 ${FOCUS_RING}`}
         disabled={submitting}
       />
 
       <div className="text-right mb-[20px]">
-        <span className="text-primary-strong text-[13.5px] font-bold cursor-pointer">
+        <a
+          href="/reset-password"
+          className="text-primary-strong-darker text-[13.5px] font-bold underline underline-offset-2"
+        >
           ¿Olvidaste tu contraseña?
-        </span>
+        </a>
       </div>
 
       {error ? (
         <p
           role="alert"
-          className="m-0 mb-[14px] text-[13.5px] font-bold text-[#d9583c]"
+          id="login-error"
+          aria-live="assertive"
+          className="m-0 mb-[14px] text-[13.5px] font-bold text-[#a5391f]"
         >
           {error}
         </p>
@@ -86,17 +103,18 @@ export function LoginForm() {
 
       <button
         type="submit"
+        aria-describedby={error ? "login-error" : undefined}
         disabled={submitting}
-        className="block w-full py-[15px] rounded-[15px] bg-[linear-gradient(180deg,var(--compose-gradient-from),var(--compose-gradient-to))] text-white font-extrabold text-[16px] cursor-pointer shadow-[0_10px_22px_-8px_rgba(238,129,100,0.7)] disabled:opacity-70 disabled:cursor-wait"
+        className="block w-full py-[15px] rounded-[15px] bg-primary-strong-darker text-white font-extrabold text-[16px] cursor-pointer shadow-[0_10px_22px_-8px_rgba(179,74,53,0.7)] disabled:opacity-70 disabled:cursor-wait hover:bg-[#7e3a26] disabled:hover:bg-primary-strong-darker"
       >
         {submitting ? "Iniciando sesión…" : "Iniciar sesión"}
       </button>
 
-      <p className="text-center mt-[24px] m-0 text-muted text-[14.5px]">
+      <p className="text-center mt-[24px] m-0 text-[#756a5d] text-[14.5px]">
         ¿Te invitó la guardería?{" "}
         <Link
           href="/activate-account"
-          className="text-primary-strong font-extrabold"
+          className="text-primary-strong-darker font-extrabold underline underline-offset-2"
         >
           Activá tu cuenta
         </Link>
