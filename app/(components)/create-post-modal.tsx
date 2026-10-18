@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useKidOptions } from "@/lib/use-kid-options";
 import {
   POST_TYPE_BADGE_COLORS,
@@ -31,6 +31,7 @@ export type CreatePostPayload = {
 function CameraGlyphIcon() {
   return (
     <svg
+      aria-hidden="true"
       width="26"
       height="26"
       viewBox="0 0 24 24"
@@ -50,6 +51,7 @@ function CameraGlyphIcon() {
 function PlusIcon() {
   return (
     <svg
+      aria-hidden="true"
       width="22"
       height="22"
       viewBox="0 0 24 24"
@@ -89,27 +91,27 @@ export function CreatePostModal({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [onClose]);
 
-  const toggleKid = useCallback((kidId: string) => {
+  function toggleKid(kidId: string) {
     setWholeRoom(false);
     setSelectedKidIds((current) =>
       current.includes(kidId)
         ? current.filter((id) => id !== kidId)
         : [...current, kidId]
     );
-  }, []);
+  }
 
-  const chooseWholeRoom = useCallback(() => {
+  function chooseWholeRoom() {
     setSelectedKidIds([]);
     setWholeRoom(true);
-  }, []);
+  }
 
-  const openFilePicker = useCallback(() => {
+  function openFilePicker() {
     if (photos.length < MAX_PHOTOS) {
       fileInputRef.current?.click();
     }
-  }, [photos.length]);
+  }
 
-  const handleFilesChosen = useCallback((files: FileList | null) => {
+  function handleFilesChosen(files: FileList | null) {
     if (!files || files.length === 0) {
       return;
     }
@@ -122,6 +124,9 @@ export function CreatePostModal({
     setPhotos((current) => {
       const room = MAX_PHOTOS - current.length;
       if (room <= 0) {
+        for (const url of newUrls) {
+          URL.revokeObjectURL(url);
+        }
         return current;
       }
       const kept = newUrls.slice(0, room);
@@ -130,18 +135,18 @@ export function CreatePostModal({
       }
       return [...current, ...kept];
     });
-  }, []);
+  }
 
-  const removePhoto = useCallback((index: number) => {
+  function removePhoto(index: number) {
     setPhotos((current) => current.filter((_, i) => i !== index));
-  }, []);
+  }
 
   const canPublish =
     type !== null &&
     description.trim().length > 0 &&
     (wholeRoom || selectedKidIds.length > 0);
 
-  const handleSubmit = useCallback(() => {
+  function handleSubmit() {
     if (!canPublish || type === null) {
       return;
     }
@@ -152,10 +157,13 @@ export function CreatePostModal({
       description: description.trim(),
       photos,
     });
-  }, [canPublish, type, onSubmit, selectedKidIds, wholeRoom, description, photos]);
+  }
 
   return (
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="create-post-modal-title"
       className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/45 px-6 py-10"
       onClick={onClose}
     >
@@ -171,8 +179,11 @@ export function CreatePostModal({
           >
             Cancelar
           </button>
-          <span className="flex-1 px-3 text-center font-display text-[18px] font-semibold text-[#3F362E]">
-            Nueva publicaciÃ³n
+          <span
+            id="create-post-modal-title"
+            className="flex-1 px-3 text-center font-display text-[18px] font-semibold text-[#3F362E]"
+          >
+            Nueva publicación
           </span>
           <button
             type="button"
@@ -186,7 +197,6 @@ export function CreatePostModal({
 
         <div
           className="relative max-h-[calc(100vh-120px)] overflow-y-auto px-[26px] py-6"
-          onClick={(event) => event.stopPropagation()}
         >
           <div className="mb-[10px] text-[12px] font-extrabold tracking-[0.7px] text-[#94887B]">
             PARA
@@ -198,6 +208,7 @@ export function CreatePostModal({
                 <button
                   key={kid.id}
                   type="button"
+                  aria-pressed={selected}
                   onClick={() => toggleKid(kid.id)}
                   className={`flex cursor-pointer items-center gap-2 rounded-full border-[1.5px] py-[6px] pl-[6px] pr-[14px] text-[14px] font-bold ${
                     selected
@@ -220,6 +231,7 @@ export function CreatePostModal({
             })}
             <button
               type="button"
+              aria-pressed={wholeRoom}
               onClick={chooseWholeRoom}
               className={`cursor-pointer rounded-full border-[1.5px] px-4 py-[6px] text-[14px] font-bold ${
                 wholeRoom
@@ -242,6 +254,7 @@ export function CreatePostModal({
                 <button
                   key={postType}
                   type="button"
+                  aria-pressed={selected}
                   onClick={() => setType(postType)}
                   className="cursor-pointer rounded-full px-4 py-2 text-[13.5px] font-extrabold"
                   style={
@@ -267,12 +280,13 @@ export function CreatePostModal({
           </div>
 
           <div className="mb-[10px] text-[12px] font-extrabold tracking-[0.7px] text-[#94887B]">
-            DESCRIPCIÃ“N
+            <label htmlFor="create-post-description">DESCRIPCIÓN</label>
           </div>
           <textarea
+            id="create-post-description"
             value={description}
             onChange={(event) => setDescription(event.target.value)}
-            placeholder="ContÃ¡ cÃ³mo le fue hoyâ€¦"
+            placeholder="Contá cómo le fue hoy…"
             className="mb-[22px] min-h-[120px] w-full resize-y rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[14px] text-[15px] leading-[1.5] text-[#3F362E] placeholder:text-[#B6A99B] focus:outline-none"
           />
 
@@ -317,6 +331,8 @@ export function CreatePostModal({
             type="file"
             accept="image/*"
             multiple
+            aria-hidden="true"
+            tabIndex={-1}
             className="hidden"
             onChange={(event) => {
               handleFilesChosen(event.target.files);

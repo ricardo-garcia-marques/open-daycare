@@ -1,15 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useCreatePost } from "./create-post-provider";
-import { useCurrentUser } from "@/lib/user-store";
+import { useCurrentUser, type CurrentUserRole } from "@/lib/user-store";
 import { createClient } from "@/utils/supabase/client";
 
 function SunIcon() {
   return (
     <svg
+      aria-hidden="true"
       width="21"
       height="21"
       viewBox="0 0 24 24"
@@ -28,6 +28,7 @@ function SunIcon() {
 function PlusIcon() {
   return (
     <svg
+      aria-hidden="true"
       width="17"
       height="17"
       viewBox="0 0 24 24"
@@ -45,6 +46,7 @@ function PlusIcon() {
 function HomeIcon() {
   return (
     <svg
+      aria-hidden="true"
       width="19"
       height="19"
       viewBox="0 0 24 24"
@@ -62,6 +64,7 @@ function HomeIcon() {
 function KidsIcon() {
   return (
     <svg
+      aria-hidden="true"
       width="19"
       height="19"
       viewBox="0 0 24 24"
@@ -81,6 +84,7 @@ function KidsIcon() {
 function BellIcon() {
   return (
     <svg
+      aria-hidden="true"
       width="19"
       height="19"
       viewBox="0 0 24 24"
@@ -98,6 +102,7 @@ function BellIcon() {
 function UserIcon() {
   return (
     <svg
+      aria-hidden="true"
       width="19"
       height="19"
       viewBox="0 0 24 24"
@@ -116,6 +121,7 @@ function UserIcon() {
 function LogoutIcon() {
   return (
     <svg
+      aria-hidden="true"
       width="16"
       height="16"
       viewBox="0 0 24 24"
@@ -130,14 +136,21 @@ function LogoutIcon() {
   );
 }
 
-const NAV_ITEMS = [
+type NavItem = {
+  href: string;
+  label: string;
+  icon: React.ReactElement;
+  exact: boolean;
+};
+
+const NAV_ITEMS: NavItem[] = [
   { href: "/", label: "Feed", icon: <HomeIcon />, exact: true },
   { href: "/kids", label: "Niños", icon: <KidsIcon />, exact: false },
   { href: "/avisos", label: "Avisos", icon: <BellIcon />, exact: false },
   { href: "/mi-cuenta", label: "Mi cuenta", icon: <UserIcon />, exact: false },
 ];
 
-const ROLE_SUBTITLE: Record<string, string> = {
+const ROLE_SUBTITLE: Record<CurrentUserRole, string> = {
   staff: "Maestra · Soles",
   parent: "Familia · Soles",
   admin: "Administración · Soles",
@@ -184,7 +197,10 @@ export function Sidebar() {
         Nueva publicación
       </button>
 
-      <nav className="flex flex-col gap-1 flex-1">
+      <nav
+        aria-label="Navegación principal"
+        className="flex flex-col gap-1 flex-1"
+      >
         {NAV_ITEMS.map((item) => {
           const itemActive = item.exact
             ? pathname === item.href
@@ -192,13 +208,14 @@ export function Sidebar() {
 
           return (
             <Link
-              key={item.label}
+              key={item.href}
               href={item.href}
-              className={
+              aria-current={itemActive ? "page" : undefined}
+              className={`flex items-center gap-3 py-[11px] px-3 rounded-[12px] text-[14.5px] ${
                 itemActive
-                  ? "flex items-center gap-3 py-[11px] px-3 rounded-[12px] bg-nav-active-bg text-primary font-extrabold text-[14.5px]"
-                  : "flex items-center gap-3 py-[11px] px-3 rounded-[12px] bg-transparent text-nav-inactive font-semibold text-[14.5px]"
-              }
+                  ? "bg-nav-active-bg text-primary font-extrabold"
+                  : "bg-transparent text-nav-inactive font-semibold"
+              }`}
             >
               {item.icon}
               {item.label}
@@ -222,6 +239,7 @@ export function Sidebar() {
             type="button"
             onClick={handleSignOut}
             title="Cerrar sesión"
+            aria-label="Cerrar sesión"
             className="flex-none w-8 h-8 rounded-[10px] bg-page-bg text-muted flex items-center justify-center cursor-pointer"
           >
             <LogoutIcon />

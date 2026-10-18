@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import type { KidListItem } from "@/lib/kids-db";
 
@@ -85,18 +85,20 @@ function KidCard({ kid }: { kid: KidListItem }) {
   );
 }
 
+function filterKids(kids: KidListItem[], query: string): KidListItem[] {
+  const normalizedQuery = query.trim().toLowerCase();
+  if (!normalizedQuery) {
+    return kids;
+  }
+  return kids.filter((kid) =>
+    kid.name.toLowerCase().includes(normalizedQuery)
+  );
+}
+
 export function KidsSearch({ kids }: { kids: KidListItem[] }) {
   const [query, setQuery] = useState("");
 
-  const filteredKids = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
-    if (!normalizedQuery) {
-      return kids;
-    }
-    return kids.filter((kid) =>
-      kid.name.toLowerCase().includes(normalizedQuery)
-    );
-  }, [kids, query]);
+  const filteredKids = filterKids(kids, query);
 
   return (
     <>
@@ -107,6 +109,7 @@ export function KidsSearch({ kids }: { kids: KidListItem[] }) {
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder="Buscar niño…"
+          aria-label="Buscar niño"
           className="flex-1 border-none bg-transparent outline-none text-[15px] text-heading placeholder:text-[#B6A99B]"
         />
       </div>
