@@ -43,6 +43,16 @@ Este proyecto usa Supabase como backend (base de datos Postgres, Auth, Storage, 
 - Revisar `supabase_get_advisors` (security y performance) después de cambios DDL para detectar RLS faltante u otros problemas.
 - Nunca leer archivos del servidor ni ejecutar comandos OS vía SQL (`COPY FROM PROGRAM`, `pg_read_file`, etc.).
 
+### Acceso a la base de datos desde la app (Next.js)
+
+- La app interactúa con Supabase mediante los paquetes oficiales `@supabase/supabase-js` y `@supabase/ssr` (NO usar fetching manual ni peticiones HTTP directas a la API de Supabase).
+- Helpers de cliente ya configurados:
+  - `utils/supabase/client.ts` — `createClient()` para Client Components (browser).
+  - `utils/supabase/server.ts` — `createClient(cookieStore)` para Server Components/Actions (usa `cookies()` de `next/headers`).
+  - `proxy.ts` en la raíz + `utils/supabase/proxy.ts` (`updateSession`) — refresca la sesión del usuario en cada request (Next.js 16 usa `proxy.ts`, no `middleware.ts`).
+- Variables de entorno: `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (en `.env`, ver `.env.template`).
+- Al añadir nuevas páginas/rutas que lean datos, usar el cliente de servidor; para llamadas desde el navegador, usar el cliente de browser.
+
 ## Skills
 
 - /spec Usaremos esta habilidad para crear las especificaciones.
