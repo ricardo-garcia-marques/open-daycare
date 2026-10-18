@@ -1,31 +1,12 @@
-"use client";
-
-import { useState } from "react";
 import { Sidebar } from "../(components)/sidebar";
 import { KidsSearch } from "../(components)/kids-search";
-import { AddKidModal, type AddKidModalMode } from "../(components)/add-kid-modal";
-import { useKidsStore } from "@/lib/kids-store";
+import { AddKidModalLauncher } from "../(components)/add-kid-modal-launcher";
+import { listKids } from "@/lib/kids-db";
 
-function PlusIcon() {
-  return (
-    <svg
-      width="17"
-      height="17"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="#fff"
-      strokeWidth="2.4"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M12 5v14M5 12h14" />
-    </svg>
-  );
-}
+export const instant = false;
 
-export default function KidsPage() {
-  const { kids } = useKidsStore();
-  const [modalMode, setModalMode] = useState<AddKidModalMode | null>(null);
+export default async function KidsPage() {
+  const kids = await listKids();
 
   return (
     <div className="flex min-h-screen bg-page-bg">
@@ -42,21 +23,12 @@ export default function KidsPage() {
                 Niños
               </h1>
             </div>
-            <button
-              type="button"
-              onClick={() => setModalMode({ kind: "create" })}
-              className="flex items-center gap-2 py-[11px] px-[18px] rounded-[14px] bg-gradient-to-b from-compose-gradient-from to-compose-gradient-to text-white font-extrabold text-[14.5px] shadow-[0_8px_18px_-8px_rgba(238,129,100,0.7)] cursor-pointer"
-            >
-              <PlusIcon />
-              Agregar niño
-            </button>
+            <AddKidModalLauncher />
           </div>
 
           <KidsSearch kids={kids} />
         </div>
       </main>
-
-      {modalMode ? <AddKidModal mode={modalMode} onClose={() => setModalMode(null)} /> : null}
     </div>
   );
 }

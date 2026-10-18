@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { connection } from "next/server";
 import { cache } from "react";
 import { createClient } from "@/utils/supabase/server";
 import { calculateAgeInYears, kidsAvatarColors } from "@/lib/kid-presenters";
@@ -54,6 +55,7 @@ function toListItem(row: ChildRow): KidListItem {
 }
 
 export const listKids = cache(async (): Promise<KidListItem[]> => {
+  await connection();
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
   const { data, error } = await supabase
@@ -67,6 +69,7 @@ export const listKids = cache(async (): Promise<KidListItem[]> => {
 });
 
 export async function getKidById(id: string): Promise<KidDetail | null> {
+  await connection();
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
   const { data, error } = await supabase

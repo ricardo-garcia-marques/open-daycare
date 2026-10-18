@@ -1,8 +1,8 @@
-"use client";
+﻿"use client";
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import type { Kid } from "@/lib/mock-kids";
+import type { KidListItem } from "@/lib/kids-db";
 
 function ChevronIcon() {
   return (
@@ -39,7 +39,7 @@ function SearchIcon() {
   );
 }
 
-function parentsLabel(kid: Kid): string {
+function parentsLabel(kid: KidListItem): string {
   const parentCount = kid.linkedParents.length;
   if (parentCount === 0) {
     return "sin padres vinculados";
@@ -47,7 +47,7 @@ function parentsLabel(kid: Kid): string {
   return `${parentCount} ${parentCount === 1 ? "padre vinculado" : "padres vinculados"}`;
 }
 
-function KidCard({ kid }: { kid: Kid }) {
+function KidCard({ kid }: { kid: KidListItem }) {
   const showAllergyBadge = kid.allergies.length > 0;
   const showLinkBadge = kid.linkedParents.length === 0;
 
@@ -85,7 +85,7 @@ function KidCard({ kid }: { kid: Kid }) {
   );
 }
 
-export function KidsSearch({ kids }: { kids: Kid[] }) {
+export function KidsSearch({ kids }: { kids: KidListItem[] }) {
   const [query, setQuery] = useState("");
 
   const filteredKids = useMemo(() => {
