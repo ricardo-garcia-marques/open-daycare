@@ -49,6 +49,7 @@ Este proyecto usa Supabase como backend (base de datos Postgres, Auth, Storage, 
 - /spec-impl Usaremos esta skill para hacer las implementaciones.
 - /supabase Skill obligatoria para tareas con Supabase (DB, Auth, Storage, Edge Functions, Realtime, RLS, debugging, logs).
 - /supabase-postgres-best-practices Skill obligatoria antes de escribir o cambiar SQL/esquema en Postgres (tipos, migraciones, RLS, índices, performance).
+- Cualquier spec que involucre la base de datos (tablas, esquema, RLS, migraciones, auth con Supabase, etc.) debe ubicarse en `specs/database/`. El resto de specs van en `specs/`.
 
 ## Spec Driven Development - Verificación
 
