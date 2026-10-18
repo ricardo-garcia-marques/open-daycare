@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { useCreatePost } from "./create-post-provider";
+import { useCurrentUser } from "@/lib/user-store";
 import { createClient } from "@/utils/supabase/client";
 
 function SunIcon() {
@@ -136,10 +137,22 @@ const NAV_ITEMS = [
   { href: "/mi-cuenta", label: "Mi cuenta", icon: <UserIcon />, exact: false },
 ];
 
+const ROLE_SUBTITLE: Record<string, string> = {
+  staff: "Maestra · Soles",
+  parent: "Familia · Soles",
+  admin: "Administración · Soles",
+};
+
 export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const { openCreatePost } = useCreatePost();
+  const user = useCurrentUser();
+
+  const displayName = user.status === "ready" ? user.fullName : "—";
+  const displayInitial = user.status === "ready" ? user.initial : "?";
+  const roleSubtitle =
+    user.status === "ready" ? ROLE_SUBTITLE[user.role] : "—";
 
   async function handleSignOut() {
     const supabase = createClient();
@@ -197,13 +210,13 @@ export function Sidebar() {
       <div className="border-t border-border pt-[14px] mt-2.5">
         <div className="flex items-center gap-[11px] px-2 py-1.5">
           <div className="w-[38px] h-[38px] rounded-full bg-accent text-white font-display font-semibold text-[16px] flex items-center justify-center flex-none">
-            C
+            {displayInitial}
           </div>
           <div className="flex-1 min-w-0">
             <div className="font-extrabold text-[14px] text-heading">
-              Caro Giménez
+              {displayName}
             </div>
-            <div className="text-[12px] text-muted-light">Maestra · Soles</div>
+            <div className="text-[12px] text-muted-light">{roleSubtitle}</div>
           </div>
           <button
             type="button"
