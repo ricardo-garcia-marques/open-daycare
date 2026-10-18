@@ -1,6 +1,7 @@
 import { Sidebar } from "./(components)/sidebar";
 import { ComposerCard } from "./(components)/composer-card";
 import { FeedPosts } from "./(components)/feed-posts";
+import { FeedGreeting } from "./(components)/feed-greeting";
 
 export default function HomePage() {
   return (
@@ -13,9 +14,7 @@ export default function HomePage() {
             <div className="text-[12.5px] font-extrabold tracking-[0.8px] text-primary mb-1">
               GUARDERÍA · SALA SOLES
             </div>
-            <h1 className="font-display font-semibold text-[30px] m-0 text-heading">
-              Buenas, Caro
-            </h1>
+            <FeedGreeting />
             <p className="mt-[5px] mb-0 text-muted text-[14.5px]">
               12 niños · martes 17 jun
             </p>
