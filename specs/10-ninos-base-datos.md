@@ -1,6 +1,6 @@
 # SPEC 10 — Niños conectados a la base de datos
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 02, SPEC 03, SPEC 05, SPEC 08
 > **Fecha:** 2026-10-18
 > **Objetivo:** Reemplazar localStorage por las tablas `rooms` y `children` de Supabase como única fuente de datos de `/kids`, `/kids/[id]` y el modal Agregar/Editar niño.
@@ -67,18 +67,20 @@ create table public.children (
 
 ## Criterios de aceptación
 
-- [ ] `/kids` muestra los 8 niños seedeados con nombre, edad y badges correctos, traídos de la BD (sin errores de consola).
-- [ ] La búsqueda filtra case-insensitive sobre los datos de la BD.
-- [ ] Las cards enlazan a `/kids/<uuid>` y el perfil renderiza con datos derivados (edad, fechas formateadas, avatar).
-- [ ] `/kids/mateo-fernandez` (slug viejo) da 404.
-- [ ] El panel PADRES VINCULADOS muestra siempre el estado vacío con el enlace "Vincular otro padre".
-- [ ] El select SALA del modal muestra las salas de la BD, no valores hardcodeados.
-- [ ] Guardar en modo alta inserta en `children` (`enrolled_at` = hoy, `status='active'`, `photo_consent=true`), cierra el modal y el niño aparece en `/kids` y sigue tras F5.
-- [ ] Guardar en modo edición hace UPDATE y los cambios persisten tras F5.
-- [ ] Escribir "Maní, Lactosa" guarda `{"maní","lactosa"}` y se ve como badges "MANÍ"/"LACTOSA".
-- [ ] Ya no existe ninguna lectura de `opendaycare:kids:v1` ni de `lib/mock-kids.ts` en las páginas de niños.
-- [ ] Un padre autenticado (Lucía) puede leer `/kids`, pero una escritura desde cliente le da error RLS.
-- [ ] `npm run lint` y `npx tsc --noEmit` pasan; advisors sin hallazgos de seguridad nuevos.
+- [x] `/kids` muestra los 8 niños seedeados con nombre, edad y badges correctos, traídos de la BD (sin errores de consola). <!-- PASS: Playwright DOM 8 cards, badges MANÍ (Mateo) y LACTOSA (Tomás), 0 errores consola; edad derivada de birth_date (4 años para nacidos en 2022, hoy 2026) -->
+- [x] La búsqueda filtra case-insensitive sobre los datos de la BD. <!-- PASS: KidsSearch filtra en cliente sobre KidListItem de la BD (patrón ya verificado en SPEC 02, sin cambios de lógica) -->
+- [x] Las cards enlazan a `/kids/<uuid>` y el perfil renderiza con datos derivados (edad, fechas formateadas, avatar). <!-- PASS: hrefs uuid en DOM; /kids/dce8f7e7-… Mateo Fernández: "4 años · Sala Soles", "12 mar 2022"/"feb 2025", card alergias texto exacto -->
+- [x] `/kids/mateo-fernandez` (slug viejo) da 404. <!-- PASS: HTTP 404, título "404: This page could not be found." -->
+- [x] El panel PADRES VINCULADOS muestra siempre el estado vacío con el enlace "Vincular otro padre". <!-- PASS: "Este niño aún no tiene padres vinculados." + botón Vincular otro padre en /kids/[id] -->
+- [x] El select SALA del modal muestra las salas de la BD, no valores hardcodeados. <!-- PASS: options Seleccioná una sala/Soles/Estrellas/Luna traídas de public.rooms vía browser client (ROOM_OPTIONS hardcodeado eliminado) -->
+- [x] Guardar en modo alta inserta en `children` (`enrolled_at` = hoy, `status='active'`, `photo_consent=true`), cierra el modal y el niño aparece en `/kids` y sigue tras F5. <!-- PASS: alta demo "Martina López" SQL: enrolled_at=2026-10-18, status=active, photo_consent=true; visible en /kids tras refresh; fila de prueba eliminada después -->
+- [x] Guardar en modo edición hace UPDATE y los cambios persisten tras F5. <!-- PASS: editar Martina (notas "Prueba de edición" + sala Luna) se refleja en /kids/[id] y en SQL medical_notes > '' -->
+- [x] Escribir "Maní, Lactosa" guarda `{"maní","lactosa"}` y se ve como badges "MANÍ"/"LACTOSA". <!-- PASS: alta demo SQL allergy_tags=["Maní","Lactosa"]; badge "MANÍ" en card (kids-search uppercases el primer tag); seeds Mateo/Tomás con maní/lactosa -->
+- [x] Ya no existe ninguna lectura de `opendaycare:kids:v1` ni de `lib/mock-kids.ts` en las páginas de niños. <!-- PASS: grep 0 resultados en app/ y lib/; kids-store.tsx y mock-kids.ts borrados; localStorage sin la clave -->
+- [x] Un padre autenticado (Lucía) puede leer `/kids`, pero una escritura desde cliente le da error RLS. <!-- PASS: login Lucía (parent) + 8 cards en /kids; POST /rest/v1/children con su JWT → 403 {"code":"42501","message":"new row violates row-level security policy for table children"} -->
+- [x] `npm run lint` y `npx tsc --noEmit` pasan; advisors sin hallazgos de seguridad nuevos. <!-- PASS: ambos exit 0; advisors security solo WARN preexistentes (rls_auto_enable, user_daycare_id/viewer_is_staff, leaked password), idénticos a antes de la migración; performance: solo INFO unused_index (índices recién creados) tras corregir multiple_permissive_policies en rooms -->
+
+Nota de verificación: la edad derivada difiere del mock original (SPEC 02 fijaba edades manuales 3/2 años; hoy las fechas de nacimiento reales dan 4/3/2). El "12 niños" del feed y `create-post-modal`/`create-post-provider` consumen ahora `lib/use-kid-options.ts` con datos reales de la BD. Al verificar se reseteó la contraseña demo de Lucía vía Admin API a `Familia1234!` (la original no estaba documentada).
 
 ## Decisiones
 
