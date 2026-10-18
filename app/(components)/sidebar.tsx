@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { useCreatePost } from "./create-post-provider";
+import { createClient } from "@/utils/supabase/client";
 
 function SunIcon() {
   return (
@@ -136,7 +138,16 @@ const NAV_ITEMS = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { openCreatePost } = useCreatePost();
+
+  async function handleSignOut() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.replace("/login");
+    router.refresh();
+  }
+
   return (
     <aside className="w-[248px] flex-none bg-surface border-r border-border flex flex-col py-6 px-4 sticky top-0 h-screen">
       <Link href="/" className="flex items-center gap-[11px] px-2 pt-1 pb-[22px]">
@@ -194,13 +205,14 @@ export function Sidebar() {
             </div>
             <div className="text-[12px] text-muted-light">Maestra · Soles</div>
           </div>
-          <Link
-            href="/login"
+          <button
+            type="button"
+            onClick={handleSignOut}
             title="Cerrar sesión"
-            className="flex-none w-8 h-8 rounded-[10px] bg-page-bg text-muted flex items-center justify-center"
+            className="flex-none w-8 h-8 rounded-[10px] bg-page-bg text-muted flex items-center justify-center cursor-pointer"
           >
             <LogoutIcon />
-          </Link>
+          </button>
         </div>
       </div>
     </aside>
