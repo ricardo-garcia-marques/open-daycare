@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const SunIcon = (
@@ -36,25 +37,63 @@ const CheckIcon = (
   </svg>
 );
 
-const initialForm = {
-  code: "7K4P9",
-  email: "lucia.fernandez@gmail.com",
-  password: "contraseña",
-  photoConsent: true,
-};
-
 const labelClass = "text-[12px] font-bold tracking-[0.7px] text-muted mb-[8px]";
 const inputClass =
   "w-full px-[16px] py-[14px] rounded-[14px] border-[1.5px] border-input-border bg-white text-[15px] text-heading mb-[18px] focus:outline-none placeholder:text-placeholder";
 
 export function ActivateAccountForm() {
-  const [code, setCode] = useState(initialForm.code);
-  const [email, setEmail] = useState(initialForm.email);
-  const [password, setPassword] = useState(initialForm.password);
-  const [photoConsent, setPhotoConsent] = useState(initialForm.photoConsent);
+  const router = useRouter();
+  const [code, setCode] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [photoConsent, setPhotoConsent] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  const codeValid = code.trim().length === 5;
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const passwordValid = password.length >= 6;
+  const canSubmit =
+    codeValid && emailValid && passwordValid && photoConsent && !submitting;
+
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
+    if (!canSubmit) return;
+
+    setSubmitting(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/activate-account", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code: code.trim(),
+          email: email.trim(),
+          password,
+          fullName: "Lucía Fernández",
+          photoConsent,
+        }),
+      });
+
+      const data = (await response.json()) as { error: string | null };
+
+      if (!response.ok || data.error) {
+        setError(data.error ?? "No se pudo activar la cuenta");
+        setSubmitting(false);
+        return;
+      }
+
+      router.replace("/");
+      router.refresh();
+    } catch {
+      setError("No se pudo activar la cuenta");
+      setSubmitting(false);
+    }
+  }
 
   return (
-    <div className="w-full max-w-[440px]">
+    <form onSubmit={handleSubmit} className="w-full max-w-[440px]">
       <div
         className="w-[58px] h-[58px] rounded-[18px] mb-[22px] flex items-center justify-center shadow-[0_12px_26px_-10px_rgba(238,129,100,0.65)]"
         style={{
@@ -90,8 +129,9 @@ export function ActivateAccountForm() {
         type="text"
         maxLength={5}
         value={code}
-        onChange={(event) => setCode(event.target.value)}
-        className={`${inputClass} font-display text-[18px] tracking-[3px] font-bold`}
+        onChange={(event) => setCode(event.target.value.toUpperCase())}
+        className={`${inputClass} font-display text-[18px] tracking-[3px] font-bold disabled:opacity-60`}
+        disabled={submitting}
       />
 
       <div className={labelClass}>EMAIL</div>
@@ -99,7 +139,8 @@ export function ActivateAccountForm() {
         type="email"
         value={email}
         onChange={(event) => setEmail(event.target.value)}
-        className={inputClass}
+        className={`${inputClass} disabled:opacity-60`}
+        disabled={submitting}
       />
 
       <div className={labelClass}>CREAR CONTRASEÑA</div>
@@ -107,7 +148,8 @@ export function ActivateAccountForm() {
         type="password"
         value={password}
         onChange={(event) => setPassword(event.target.value)}
-        className={`${inputClass} border-[#f2a78e]`}
+        className={`${inputClass} border-[#f2a78e] disabled:opacity-60`}
+        disabled={submitting}
       />
 
       <label className="flex items-start gap-[12px] bg-consent-bg rounded-[14px] px-[16px] py-[14px] mb-[24px] cursor-pointer">
@@ -116,6 +158,7 @@ export function ActivateAccountForm() {
           checked={photoConsent}
           onChange={(event) => setPhotoConsent(event.target.checked)}
           className="sr-only"
+          disabled={submitting}
         />
         <span
           className={`flex-none w-[24px] h-[24px] rounded-[8px] mt-[1px] flex items-center justify-center ${
@@ -130,12 +173,22 @@ export function ActivateAccountForm() {
         </span>
       </label>
 
-      <Link
-        href="/login"
-        className="block text-center w-full py-[15px] rounded-[15px] bg-[linear-gradient(180deg,var(--compose-gradient-from),var(--compose-gradient-to))] text-white font-extrabold text-[16px] shadow-[0_10px_22px_-8px_rgba(238,129,100,0.7)]"
+      {error ? (
+        <p
+          role="alert"
+          className="m-0 mb-[14px] text-[13.5px] font-bold text-[#d9583c]"
+        >
+          {error}
+        </p>
+      ) : null}
+
+      <button
+        type="submit"
+        disabled={!canSubmit}
+        className="block text-center w-full py-[15px] rounded-[15px] bg-[linear-gradient(180deg,var(--compose-gradient-from),var(--compose-gradient-to))] text-white font-extrabold text-[16px] shadow-[0_10px_22px_-8px_rgba(238,129,100,0.7)] disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
       >
-        Activar mi cuenta
-      </Link>
+        {submitting ? "Activando…" : "Activar mi cuenta"}
+      </button>
 
       <p className="text-center mt-[22px] m-0 text-muted text-[14.5px]">
         ¿Ya tenés cuenta?{" "}
@@ -143,6 +196,6 @@ export function ActivateAccountForm() {
           Iniciar sesión
         </Link>
       </p>
-    </div>
+    </form>
   );
 }

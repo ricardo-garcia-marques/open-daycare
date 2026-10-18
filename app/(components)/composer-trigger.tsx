@@ -1,4 +1,6 @@
-import type { ReactNode } from "react";
+"use client";
+
+import { useCurrentUser } from "@/lib/user-store";
 
 function CameraIcon() {
   return (
@@ -19,10 +21,12 @@ function CameraIcon() {
 }
 
 export function ComposerTrigger() {
+  const user = useCurrentUser();
+  const displayInitial = user.status === "ready" ? user.initial : "";
   return (
     <span className="flex items-center gap-[14px] bg-surface border border-border rounded-[18px] px-[18px] py-[14px] shadow-[0_4px_14px_-10px_rgba(120,90,60,0.4)]">
       <div className="w-10 h-10 rounded-full bg-accent text-white font-display font-semibold text-[16px] flex items-center justify-center flex-none">
-        C
+        {displayInitial}
       </div>
       <span className="flex-1 text-muted-light text-[15px]">
         Compartí un momento…
@@ -33,5 +37,3 @@ export function ComposerTrigger() {
     </span>
   );
 }
-
-export type ComposerTriggerProps = { children?: ReactNode };

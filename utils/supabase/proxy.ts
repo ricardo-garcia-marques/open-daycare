@@ -21,7 +21,7 @@ export const updateSession = async (request: NextRequest) => {
           return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
           supabaseResponse = NextResponse.next({
             request,
           })
@@ -45,6 +45,28 @@ export const updateSession = async (request: NextRequest) => {
   // when a request is made to a specific path or set of paths.
   const { data } = await supabase.auth.getClaims()
   const user = data?.claims
+
+  const { pathname } = request.nextUrl
+
+  // API routes handle their own auth (e.g. activation with the service role);
+  // the proxy must not redirect them.
+  if (pathname.startsWith("/api")) {
+    return supabaseResponse
+  }
+
+  // Route protection (SPEC 08): everything except the auth screens requires a
+  // session. Authentication only — role-based authorization stays server-side.
+  if (!user && pathname !== "/login" && pathname !== "/activate-account") {
+    const url = request.nextUrl.clone()
+    url.pathname = "/login"
+    return NextResponse.redirect(url)
+  }
+
+  if (user && pathname === "/login") {
+    const url = request.nextUrl.clone()
+    url.pathname = "/"
+    return NextResponse.redirect(url)
+  }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is.
   // If you're creating a new response object with NextResponse.next() make sure to:
