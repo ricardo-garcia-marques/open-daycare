@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useKidOptions } from "@/lib/use-kid-options";
 import {
   POST_TYPE_BADGE_COLORS,
@@ -32,26 +32,6 @@ type PhotoItem = {
   url: string;
   file: File;
 };
-
-function CameraGlyphIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      width="26"
-      height="26"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.7"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect x="3" y="3" width="18" height="18" rx="2" />
-      <circle cx="9" cy="9" r="2" />
-      <path d="m21 15-3.6-3.6a2 2 0 0 0-2.8 0L6 21" />
-    </svg>
-  );
-}
 
 function PlusIcon() {
   return (
@@ -88,7 +68,6 @@ export function CreatePostModal({
   const [type, setType] = useState<PostType | null>(null);
   const [description, setDescription] = useState("");
   const [photoItems, setPhotoItems] = useState<PhotoItem[]>([]);
-  const photoInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -330,40 +309,33 @@ export function CreatePostModal({
                 />
               </button>
             ))}
-            {photoItems.length === 0 && (
-              <div className="flex h-24 w-24 items-center justify-center rounded-[14px] border border-[#ECE0D0] bg-[#F4ECE1] text-[#CBB89F]">
-                <CameraGlyphIcon />
-              </div>
-            )}
             {photoItems.length < MAX_PHOTOS && (
-              <label
-                role="button"
-                aria-label="Agregar foto"
-                title="Agregar foto"
+              <div
                 className={
                   photosDisabled
-                    ? "flex h-24 w-24 cursor-not-allowed flex-col items-center justify-center gap-[6px] rounded-[14px] border-[1.5px] border-dashed border-[#DBCDBA] bg-[#F4ECE1] text-[#B0A290] opacity-50"
-                    : "flex h-24 w-24 cursor-pointer flex-col items-center justify-center gap-[6px] rounded-[14px] border-[1.5px] border-dashed border-[#DBCDBA] bg-[#F4ECE1] text-[#B0A290]"
+                    ? "relative flex h-24 w-24 cursor-not-allowed flex-col items-center justify-center gap-[6px] rounded-[14px] border-[1.5px] border-dashed border-[#DBCDBA] bg-[#F4ECE1] text-[#B0A290] opacity-50"
+                    : "relative flex h-24 w-24 cursor-pointer flex-col items-center justify-center gap-[6px] rounded-[14px] border-[1.5px] border-dashed border-[#DBCDBA] bg-[#F4ECE1] text-[#B0A290]"
                 }
               >
                 <PlusIcon />
                 <span className="text-[12px]">Agregar</span>
-                <input
-                  ref={photoInputRef}
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  disabled={photosDisabled}
-                  tabIndex={-1}
-                  className="sr-only"
-                  onChange={(event) => {
-                    if (event.target.files) {
-                      handleFilesChosen(event.target.files);
-                    }
-                    event.target.value = "";
-                  }}
-                />
-              </label>
+                {!photosDisabled && (
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    aria-label="Agregar foto"
+                    tabIndex={-1}
+                    className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                    onChange={(event) => {
+                      if (event.target.files) {
+                        handleFilesChosen(event.target.files);
+                      }
+                      event.target.value = "";
+                    }}
+                  />
+                )}
+              </div>
             )}
           </div>
         </div>
