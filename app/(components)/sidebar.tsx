@@ -162,6 +162,9 @@ export function Sidebar() {
   const { openCreatePost } = useCreatePost();
   const user = useCurrentUser();
 
+  const canCreatePosts =
+    user.status === "ready" && (user.role === "staff" || user.role === "admin");
+
   const displayName = user.status === "ready" ? user.fullName : "—";
   const displayInitial = user.status === "ready" ? user.initial : "?";
   const roleSubtitle =
@@ -188,14 +191,16 @@ export function Sidebar() {
         </div>
       </Link>
 
-      <button
-        type="button"
-        onClick={openCreatePost}
-        className="flex items-center justify-center gap-2 w-full py-3 rounded-[14px] bg-gradient-to-b from-compose-gradient-from to-compose-gradient-to text-white font-extrabold text-[14.5px] shadow-[0_8px_18px_-8px_rgba(238,129,100,0.75)] mb-[18px] cursor-pointer"
-      >
-        <PlusIcon />
-        Nueva publicación
-      </button>
+      {canCreatePosts && (
+        <button
+          type="button"
+          onClick={openCreatePost}
+          className="flex items-center justify-center gap-2 w-full py-3 rounded-[14px] bg-gradient-to-b from-compose-gradient-from to-compose-gradient-to text-white font-extrabold text-[14.5px] shadow-[0_8px_18px_-8px_rgba(238,129,100,0.75)] mb-[18px] cursor-pointer"
+        >
+          <PlusIcon />
+          Nueva publicación
+        </button>
+      )}
 
       <nav
         aria-label="Navegación principal"
