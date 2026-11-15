@@ -358,7 +358,10 @@ export function CreatePostModal({
             multiple
             aria-hidden="true"
             tabIndex={-1}
-            className="hidden"
+            /* Visually hidden but rendered: browsers like Safari refuse to
+               open the file chooser for a `display: none` input. */
+            className="absolute h-px w-px overflow-hidden whitespace-nowrap opacity-0"
+            style={{ clip: "rect(0 0 0 0)", clipPath: "inset(50%)" }}
             onChange={(event) => {
               handleFilesChosen(event.target.files);
               event.target.value = "";
