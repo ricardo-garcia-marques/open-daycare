@@ -2,8 +2,10 @@ import { Sidebar } from "./(components)/sidebar";
 import { ComposerCard } from "./(components)/composer-card";
 import { FeedPosts } from "./(components)/feed-posts";
 import { FeedGreeting } from "./(components)/feed-greeting";
+import { fetchFeedPosts } from "@/lib/posts-db";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const initialPosts = await fetchFeedPosts();
   return (
     <div className="flex min-h-screen bg-page-bg">
       <Sidebar />
@@ -29,7 +31,7 @@ export default function HomePage() {
             <span className="flex-1 h-px bg-divider" />
           </div>
 
-          <FeedPosts />
+          <FeedPosts initialPosts={initialPosts} />
         </div>
       </main>
     </div>
