@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import {
   POST_TYPE_BADGE_COLORS,
   POST_TYPE_LABELS,
-  type PostType,
 } from "@/lib/mock-feed";
 import { MegaphoneIcon } from "./megaphone-icon";
 import { HeartIcon, CommentIcon } from "./feed-icons";

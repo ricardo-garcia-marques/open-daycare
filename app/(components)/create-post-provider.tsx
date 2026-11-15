@@ -13,7 +13,6 @@ import { useCurrentUser } from "@/lib/user-store";
 import { kidsAvatarColors } from "@/lib/kid-presenters";
 import { createClient } from "@/utils/supabase/client";
 import { CreatePostModal, type CreatePostPayload } from "./create-post-modal";
-import type { FeedPostView } from "./feed-posts-updater";
 import { prependFeedPost } from "./feed-posts-updater";
 
 type CreatePostContextValue = {

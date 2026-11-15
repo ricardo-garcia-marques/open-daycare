@@ -97,14 +97,6 @@ export function CreatePostModal({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [onClose, submitting]);
 
-  function revokePhoto(url: string) {
-    URL.revokeObjectURL(url);
-    const index = photos.indexOf(url);
-    if (index >= 0) {
-      setPhotoFiles((current) => current.filter((_, i) => i !== index));
-    }
-  }
-
   function toggleKid(kidId: string) {
     setWholeRoom(false);
     setSelectedKidIds((current) =>
