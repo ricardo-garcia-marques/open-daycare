@@ -9,9 +9,12 @@ import {
   type ReactNode,
 } from "react";
 import { useKidOptions } from "@/lib/use-kid-options";
-import { usePostsStore } from "@/lib/posts-store";
 import { useCurrentUser } from "@/lib/user-store";
+import { kidsAvatarColors } from "@/lib/kid-presenters";
+import { createClient } from "@/utils/supabase/client";
 import { CreatePostModal, type CreatePostPayload } from "./create-post-modal";
+import type { FeedPostView } from "./feed-posts-updater";
+import { prependFeedPost } from "./feed-posts-updater";
 
 type CreatePostContextValue = {
   openCreatePost: () => void;
@@ -19,12 +22,7 @@ type CreatePostContextValue = {
 
 const CreatePostContext = createContext<CreatePostContextValue | null>(null);
 
-function formatClock(): string {
-  const now = new Date();
-  const hours = String(now.getHours()).padStart(2, "0");
-  const minutes = String(now.getMinutes()).padStart(2, "0");
-  return `${hours}:${minutes}`;
-}
+const POST_IMAGES_BUCKET = "post-images";
 
 function buildAddressedTo(
   kidsById: Map<string, string>,
@@ -43,38 +41,135 @@ function buildAddressedTo(
   return `familias de ${firstNames.join(", ")}`;
 }
 
+function getPhotoPathExtension(file: File): string {
+  const extension = file.name.includes(".")
+    ? file.name.split(".").pop()!
+    : "jpg";
+  return extension.toLowerCase();
+}
+
+function formatClock(): string {
+  const now = new Date();
+  const hours = String(now.getHours()).padStart(2, "0");
+  const minutes = String(now.getMinutes()).padStart(2, "0");
+  return `${hours}:${minutes}`;
+}
+
+async function runPublishFlow(
+  kids: ReturnType<typeof useKidOptions>,
+  userId: string,
+  authorName: string,
+  payload: CreatePostPayload
+): Promise<void> {
+  const supabase = createClient();
+  const postId = crypto.randomUUID();
+  const kidsById = new Map(kids.map((kid) => [kid.id, kid.name]));
+
+  const { error: insertError } = await supabase
+    .from("posts")
+    .insert({
+      id: postId,
+      author_id: userId,
+      type: payload.type,
+      description: payload.description,
+      whole_room: payload.wholeRoom,
+    });
+  if (insertError) {
+    throw new Error(insertError.message);
+  }
+
+  if (!payload.wholeRoom && payload.selectedKidIds.length > 0) {
+    const { error: recipientsError } = await supabase
+      .from("post_recipients")
+      .insert(
+        payload.selectedKidIds.map((childId) => ({
+          post_id: postId,
+          child_id: childId,
+        }))
+      );
+    if (recipientsError) {
+      await supabase.from("posts").delete().eq("id", postId);
+      throw new Error(recipientsError.message);
+    }
+  }
+
+  const photos: string[] = [];
+  const sessionPhotoUrls: string[] = [];
+  try {
+    for (const file of payload.photoFiles) {
+      const extension = getPhotoPathExtension(file);
+      const path = `${postId}/${crypto.randomUUID()}.${extension}`;
+      const { error: uploadError } = await supabase.storage
+        .from(POST_IMAGES_BUCKET)
+        .upload(path, file, { cacheControl: "3600", upsert: false });
+      if (uploadError) {
+        throw new Error(uploadError.message);
+      }
+      photos.push(path);
+      sessionPhotoUrls.push(URL.createObjectURL(file));
+    }
+  } catch (uploadFailure) {
+    if (photos.length > 0) {
+      await supabase.storage.from(POST_IMAGES_BUCKET).remove(photos);
+    }
+    await supabase.from("posts").delete().eq("id", postId);
+    throw uploadFailure;
+  }
+
+  if (photos.length > 0) {
+    const { error: updateError } = await supabase
+      .from("posts")
+      .update({ photos })
+      .eq("id", postId);
+    if (updateError) {
+      await supabase.storage.from(POST_IMAGES_BUCKET).remove(photos);
+      await supabase.from("posts").delete().eq("id", postId);
+      throw new Error(updateError.message);
+    }
+  }
+
+  prependFeedPost({
+    id: postId,
+    authorName,
+    authorInitial: authorName.trim().charAt(0).toUpperCase(),
+    ...kidsAvatarColors(authorName),
+    type: payload.type,
+    addressedTo: buildAddressedTo(kidsById, payload),
+    text: payload.description,
+    time: formatClock(),
+    photoUrls: sessionPhotoUrls,
+    likes: 0,
+    comments: 0,
+  });
+}
+
 export function CreatePostProvider({ children }: { children: ReactNode }) {
   const kids = useKidOptions();
-  const { addPost } = usePostsStore();
   const user = useCurrentUser();
   const [open, setOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const openCreatePost = useCallback(() => setOpen(true), []);
   const close = useCallback(() => setOpen(false), []);
 
   const handleSubmit = useCallback(
-    (payload: CreatePostPayload) => {
-      const kidsById = new Map(kids.map((kid) => [kid.id, kid.name]));
-      const authorName = user.status === "ready" ? user.fullName : "Anónimo";
-      const authorInitial =
-        user.status === "ready" ? user.initial : authorName.charAt(0).toUpperCase();
-      addPost({
-        authorInitial,
-        avatarBgColor: "#F2937A",
-        avatarTextColor: "#FFFFFF",
-        authorName,
-        time: formatClock(),
-        type: payload.type,
-        addressedTo: buildAddressedTo(kidsById, payload),
-        text: payload.description,
-        likes: 0,
-        comments: 0,
-        photoUrls: payload.photos.length > 0 ? payload.photos : undefined,
-        photoCount: payload.photos.length > 0 ? payload.photos.length : undefined,
-      });
-      setOpen(false);
+    async (payload: CreatePostPayload) => {
+      if (user.status !== "ready") {
+        return;
+      }
+      setSubmitting(true);
+      setError(null);
+      try {
+        await runPublishFlow(kids, user.userId, user.fullName, payload);
+        setOpen(false);
+      } catch {
+        setError("No se pudo publicar. Intentá de nuevo.");
+      } finally {
+        setSubmitting(false);
+      }
     },
-    [kids, addPost, user]
+    [kids, user]
   );
 
   const value = useMemo(() => ({ openCreatePost }), [openCreatePost]);
@@ -82,7 +177,14 @@ export function CreatePostProvider({ children }: { children: ReactNode }) {
   return (
     <CreatePostContext.Provider value={value}>
       {children}
-      {open && <CreatePostModal onClose={close} onSubmit={handleSubmit} />}
+      {open && (
+        <CreatePostModal
+          onClose={close}
+          onSubmit={handleSubmit}
+          submitting={submitting}
+          error={error}
+        />
+      )}
     </CreatePostContext.Provider>
   );
 }

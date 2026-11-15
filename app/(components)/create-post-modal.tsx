@@ -26,6 +26,7 @@ export type CreatePostPayload = {
   type: PostType;
   description: string;
   photos: string[];
+  photoFiles: File[];
 };
 
 function CameraGlyphIcon() {
@@ -69,9 +70,13 @@ function PlusIcon() {
 export function CreatePostModal({
   onClose,
   onSubmit,
+  submitting = false,
+  error = null,
 }: {
   onClose: () => void;
   onSubmit: (payload: CreatePostPayload) => void;
+  submitting?: boolean;
+  error?: string | null;
 }) {
   const kids = useKidOptions();
   const [selectedKidIds, setSelectedKidIds] = useState<string[]>([]);
@@ -79,17 +84,26 @@ export function CreatePostModal({
   const [type, setType] = useState<PostType | null>(null);
   const [description, setDescription] = useState("");
   const [photos, setPhotos] = useState<string[]>([]);
+  const [photoFiles, setPhotoFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
+      if (event.key === "Escape" && !submitting) {
         onClose();
       }
     }
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onClose]);
+  }, [onClose, submitting]);
+
+  function revokePhoto(url: string) {
+    URL.revokeObjectURL(url);
+    const index = photos.indexOf(url);
+    if (index >= 0) {
+      setPhotoFiles((current) => current.filter((_, i) => i !== index));
+    }
+  }
 
   function toggleKid(kidId: string) {
     setWholeRoom(false);
@@ -133,15 +147,25 @@ export function CreatePostModal({
       for (const url of newUrls.slice(room)) {
         URL.revokeObjectURL(url);
       }
+      const keptFiles = Array.from(files).slice(0, room);
+      setPhotoFiles((currentFiles) => [...currentFiles, ...keptFiles]);
       return [...current, ...kept];
     });
   }
 
   function removePhoto(index: number) {
-    setPhotos((current) => current.filter((_, i) => i !== index));
+    setPhotos((current) => {
+      const url = current[index];
+      if (url) {
+        URL.revokeObjectURL(url);
+      }
+      return current.filter((_, i) => i !== index);
+    });
+    setPhotoFiles((currentFiles) => currentFiles.filter((_, i) => i !== index));
   }
 
   const canPublish =
+    !submitting &&
     type !== null &&
     description.trim().length > 0 &&
     (wholeRoom || selectedKidIds.length > 0);
@@ -156,6 +180,7 @@ export function CreatePostModal({
       type,
       description: description.trim(),
       photos,
+      photoFiles,
     });
   }
 
@@ -165,7 +190,7 @@ export function CreatePostModal({
       aria-modal="true"
       aria-labelledby="create-post-modal-title"
       className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/45 px-6 py-10"
-      onClick={onClose}
+      onClick={submitting ? undefined : onClose}
     >
       <div
         className="w-full max-w-[580px] rounded-[24px] border border-[#ECE0D0] bg-[#FBF4EC] shadow-[0_20px_50px_-24px_rgba(63,54,46,0.35)]"
@@ -175,7 +200,8 @@ export function CreatePostModal({
           <button
             type="button"
             onClick={onClose}
-            className="cursor-pointer bg-transparent p-0 text-[15px] font-bold text-[#94887B]"
+            disabled={submitting}
+            className="cursor-pointer bg-transparent p-0 text-[15px] font-bold text-[#94887B] disabled:cursor-not-allowed disabled:opacity-40"
           >
             Cancelar
           </button>
@@ -191,9 +217,18 @@ export function CreatePostModal({
             disabled={!canPublish}
             className="cursor-pointer bg-transparent p-0 text-[15px] font-extrabold text-[#D9583C] disabled:cursor-not-allowed disabled:opacity-40"
           >
-            Publicar
+            {submitting ? "Subiendo…" : "Publicar"}
           </button>
         </div>
+
+        {error && (
+          <div
+            role="alert"
+            className="mx-[26px] mt-4 rounded-[12px] border border-[#E8B4A8] bg-[#FBEAE6] px-4 py-3 text-[13.5px] font-semibold text-[#B4452B]"
+          >
+            {error}
+          </div>
+        )}
 
         <div
           className="relative max-h-[calc(100vh-120px)] overflow-y-auto px-[26px] py-6"

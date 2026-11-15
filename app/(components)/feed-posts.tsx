@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   POST_TYPE_BADGE_COLORS,
   POST_TYPE_LABELS,
@@ -8,26 +8,27 @@ import {
 } from "@/lib/mock-feed";
 import { MegaphoneIcon } from "./megaphone-icon";
 import { HeartIcon, CommentIcon } from "./feed-icons";
+import {
+  setFeedPostsUpdater,
+  type FeedPostView,
+  type FeedPostsUpdater,
+} from "./feed-posts-updater";
 
-export interface FeedPostView {
-  id: string;
-  authorName: string;
-  authorInitial: string;
-  avatarBgColor: string;
-  avatarTextColor: string;
-  type: PostType;
-  addressedTo: string;
-  text: string;
-  time: string;
-  photoUrls: string[];
-  likes: number;
-  comments: number;
-}
+export type { FeedPostView };
 
 export function FeedPosts({ initialPosts }: { initialPosts: FeedPostView[] }) {
   const [posts, setPosts] = useState(initialPosts);
+
+  useEffect(() => {
+    const updater: FeedPostsUpdater = {
+      prepend: (post) => setPosts((current) => [post, ...current]),
+    };
+    setFeedPostsUpdater(updater);
+    return () => setFeedPostsUpdater(null);
+  }, []);
+
   return (
-    <div className="flex flex-col gap-4" data-posts={posts.length}>
+    <div className="flex flex-col gap-4">
       {posts.map((post) => (
         <PostCard key={post.id} post={post} />
       ))}
