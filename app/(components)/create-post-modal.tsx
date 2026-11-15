@@ -88,7 +88,7 @@ export function CreatePostModal({
   const [type, setType] = useState<PostType | null>(null);
   const [description, setDescription] = useState("");
   const [photoItems, setPhotoItems] = useState<PhotoItem[]>([]);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const photoInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -112,12 +112,6 @@ export function CreatePostModal({
   function chooseWholeRoom() {
     setSelectedKidIds([]);
     setWholeRoom(true);
-  }
-
-  function openFilePicker() {
-    if (photoItems.length < MAX_PHOTOS) {
-      fileInputRef.current?.click();
-    }
   }
 
   function handleFilesChosen(files: FileList | null) {
@@ -160,6 +154,7 @@ export function CreatePostModal({
     type !== null &&
     description.trim().length > 0 &&
     (wholeRoom || selectedKidIds.length > 0);
+  const photosDisabled = submitting || photoItems.length >= MAX_PHOTOS;
 
   function handleSubmit() {
     if (!canPublish || type === null) {
@@ -341,32 +336,36 @@ export function CreatePostModal({
               </div>
             )}
             {photoItems.length < MAX_PHOTOS && (
-              <button
-                type="button"
-                onClick={openFilePicker}
-                className="flex h-24 w-24 cursor-pointer flex-col items-center justify-center gap-[6px] rounded-[14px] border-[1.5px] border-dashed border-[#DBCDBA] bg-[#F4ECE1] text-[#B0A290]"
+              <label
+                role="button"
+                aria-label="Agregar foto"
+                title="Agregar foto"
+                className={
+                  photosDisabled
+                    ? "flex h-24 w-24 cursor-not-allowed flex-col items-center justify-center gap-[6px] rounded-[14px] border-[1.5px] border-dashed border-[#DBCDBA] bg-[#F4ECE1] text-[#B0A290] opacity-50"
+                    : "flex h-24 w-24 cursor-pointer flex-col items-center justify-center gap-[6px] rounded-[14px] border-[1.5px] border-dashed border-[#DBCDBA] bg-[#F4ECE1] text-[#B0A290]"
+                }
               >
                 <PlusIcon />
                 <span className="text-[12px]">Agregar</span>
-              </button>
+                <input
+                  ref={photoInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  disabled={photosDisabled}
+                  tabIndex={-1}
+                  className="sr-only"
+                  onChange={(event) => {
+                    if (event.target.files) {
+                      handleFilesChosen(event.target.files);
+                    }
+                    event.target.value = "";
+                  }}
+                />
+              </label>
             )}
           </div>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            multiple
-            aria-hidden="true"
-            tabIndex={-1}
-            /* Visually hidden but rendered: browsers like Safari refuse to
-               open the file chooser for a `display: none` input. */
-            className="absolute h-px w-px overflow-hidden whitespace-nowrap opacity-0"
-            style={{ clip: "rect(0 0 0 0)", clipPath: "inset(50%)" }}
-            onChange={(event) => {
-              handleFilesChosen(event.target.files);
-              event.target.value = "";
-            }}
-          />
         </div>
       </div>
     </div>
