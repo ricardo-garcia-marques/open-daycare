@@ -1,6 +1,6 @@
 # SPEC 11 — Publicaciones reales en Supabase: tabla `posts`, fotos en Storage y feed filtrado por rol
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 07, SPEC 08, SPEC 09, SPEC 10, database/09 (users table)
 > **Fecha:** 2026-11-15
 > **Objetivo:** Reemplazar el feed de localStorage por publicaciones reales en Supabase (tabla `posts` + bucket privado `post-images`), publicables solo por staff, con fotos opcionales (máx 4, 5MB c/u) y un feed cuya visibilidad para padres se filtra por los hijos vinculados.
