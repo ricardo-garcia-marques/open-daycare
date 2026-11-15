@@ -25,8 +25,12 @@ export type CreatePostPayload = {
   wholeRoom: boolean;
   type: PostType;
   description: string;
-  photos: string[];
-  photoFiles: File[];
+  photoItems: PhotoItem[];
+};
+
+type PhotoItem = {
+  url: string;
+  file: File;
 };
 
 function CameraGlyphIcon() {
@@ -83,8 +87,7 @@ export function CreatePostModal({
   const [wholeRoom, setWholeRoom] = useState(false);
   const [type, setType] = useState<PostType | null>(null);
   const [description, setDescription] = useState("");
-  const [photos, setPhotos] = useState<string[]>([]);
-  const [photoFiles, setPhotoFiles] = useState<File[]>([]);
+  const [photoItems, setPhotoItems] = useState<PhotoItem[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -112,7 +115,7 @@ export function CreatePostModal({
   }
 
   function openFilePicker() {
-    if (photos.length < MAX_PHOTOS) {
+    if (photoItems.length < MAX_PHOTOS) {
       fileInputRef.current?.click();
     }
   }
@@ -123,37 +126,33 @@ export function CreatePostModal({
     }
     // Object URLs must be created synchronously: the FileList is emptied as
     // soon as the input value is reset, before React runs state updaters.
-    const newUrls: string[] = [];
-    for (const file of Array.from(files)) {
-      newUrls.push(URL.createObjectURL(file));
-    }
-    setPhotos((current) => {
+    const incoming = Array.from(files).map((file) => ({
+      url: URL.createObjectURL(file),
+      file,
+    }));
+    setPhotoItems((current) => {
       const room = MAX_PHOTOS - current.length;
       if (room <= 0) {
-        for (const url of newUrls) {
-          URL.revokeObjectURL(url);
+        for (const item of incoming) {
+          URL.revokeObjectURL(item.url);
         }
         return current;
       }
-      const kept = newUrls.slice(0, room);
-      for (const url of newUrls.slice(room)) {
-        URL.revokeObjectURL(url);
+      for (const item of incoming.slice(room)) {
+        URL.revokeObjectURL(item.url);
       }
-      const keptFiles = Array.from(files).slice(0, room);
-      setPhotoFiles((currentFiles) => [...currentFiles, ...keptFiles]);
-      return [...current, ...kept];
+      return [...current, ...incoming.slice(0, room)];
     });
   }
 
   function removePhoto(index: number) {
-    setPhotos((current) => {
-      const url = current[index];
-      if (url) {
-        URL.revokeObjectURL(url);
+    setPhotoItems((current) => {
+      const item = current[index];
+      if (item) {
+        URL.revokeObjectURL(item.url);
       }
       return current.filter((_, i) => i !== index);
     });
-    setPhotoFiles((currentFiles) => currentFiles.filter((_, i) => i !== index));
   }
 
   const canPublish =
@@ -171,8 +170,7 @@ export function CreatePostModal({
       wholeRoom,
       type,
       description: description.trim(),
-      photos,
-      photoFiles,
+      photoItems,
     });
   }
 
@@ -321,9 +319,9 @@ export function CreatePostModal({
             FOTOS
           </div>
           <div className="flex flex-wrap gap-3">
-            {photos.map((photoUrl, index) => (
+            {photoItems.map((item, index) => (
               <button
-                key={photoUrl}
+                key={item.url}
                 type="button"
                 onClick={() => removePhoto(index)}
                 title="Quitar foto"
@@ -331,18 +329,18 @@ export function CreatePostModal({
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={photoUrl}
+                  src={item.url}
                   alt={`Foto ${index + 1}`}
                   className="h-full w-full object-cover"
                 />
               </button>
             ))}
-            {photos.length === 0 && (
+            {photoItems.length === 0 && (
               <div className="flex h-24 w-24 items-center justify-center rounded-[14px] border border-[#ECE0D0] bg-[#F4ECE1] text-[#CBB89F]">
                 <CameraGlyphIcon />
               </div>
             )}
-            {photos.length < MAX_PHOTOS && (
+            {photoItems.length < MAX_PHOTOS && (
               <button
                 type="button"
                 onClick={openFilePicker}

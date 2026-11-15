@@ -4,6 +4,8 @@ import { FeedPosts } from "./(components)/feed-posts";
 import { FeedGreeting } from "./(components)/feed-greeting";
 import { fetchFeedPosts } from "@/lib/posts-db";
 
+export const instant = false;
+
 export default async function HomePage() {
   const initialPosts = await fetchFeedPosts();
   return (

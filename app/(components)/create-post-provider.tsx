@@ -64,10 +64,20 @@ async function runPublishFlow(
   const postId = crypto.randomUUID();
   const kidsById = new Map(kids.map((kid) => [kid.id, kid.name]));
 
+  const { data: daycareId, error: daycareError } = await supabase.rpc(
+    "user_daycare_id"
+  );
+  if (daycareError || !daycareId) {
+    throw new Error(
+      daycareError?.message ?? "User has no daycare assigned"
+    );
+  }
+
   const { error: insertError } = await supabase
     .from("posts")
     .insert({
       id: postId,
+      daycare_id: daycareId,
       author_id: userId,
       type: payload.type,
       description: payload.description,
@@ -95,17 +105,17 @@ async function runPublishFlow(
   const photos: string[] = [];
   const sessionPhotoUrls: string[] = [];
   try {
-    for (const file of payload.photoFiles) {
-      const extension = getPhotoPathExtension(file);
+    for (const item of payload.photoItems) {
+      const extension = getPhotoPathExtension(item.file);
       const path = `${postId}/${crypto.randomUUID()}.${extension}`;
       const { error: uploadError } = await supabase.storage
         .from(POST_IMAGES_BUCKET)
-        .upload(path, file, { cacheControl: "3600", upsert: false });
+        .upload(path, item.file, { cacheControl: "3600", upsert: false });
       if (uploadError) {
         throw new Error(uploadError.message);
       }
       photos.push(path);
-      sessionPhotoUrls.push(URL.createObjectURL(file));
+      sessionPhotoUrls.push(item.url);
     }
   } catch (uploadFailure) {
     if (photos.length > 0) {
